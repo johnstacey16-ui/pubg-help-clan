@@ -79,7 +79,7 @@
   const q=String(query||'').trim().toLowerCase();
   return sortedTeams(data?.teams,order).filter(t=>!onlyMine||t.isOwnTeam)
    .map(t=>({
-    ...t,players:t.players.filter(p=>!q||
+    ...t,rosterPlayers:t.players.length,players:t.players.filter(p=>!q||
      p.name.toLowerCase().includes(q))
    })).filter(t=>!q||t.players.length);
  }
@@ -105,7 +105,7 @@
    '<td><strong>'+(t.placement!==null?'#'+fmt(t.placement):'—')+'</strong></td>'+
    '<td>'+t.displayIndex+(t.isOwnTeam?' · YOUR SQUAD':'')+
    (t.assignedRoster?'':' · Unassigned')+'</td>'+
-   '<td>'+fmt(t.players.length)+(t.players.length!==t.players.length?'':'')+'</td>'+
+   '<td>'+fmt(t.rosterPlayers??t.players.length)+'</td>'+
    '<td>'+fmt(t.kills?.value)+'<small class="lobby-coverage">n='+fmt(t.kills?.observed)+'</small></td>'+
    '<td>'+fmt(t.damage?.value,1)+'<small class="lobby-coverage">n='+fmt(t.damage?.observed)+'</small></td>'+
    '<td>'+fmt(t.knocks?.value)+'<small class="lobby-coverage">n='+fmt(t.knocks?.observed)+'</small></td></tr>'
@@ -176,7 +176,7 @@
   ['lobby-sort','lobby-search','lobby-team-scope'].forEach(id=>
    $(id).addEventListener(id==='lobby-search'?'input':'change',paint));
   $('lobby-match').addEventListener('change',()=>{
-   report=null;$('lobby-export').disabled=true;
+   request++;report=null;$('lobby-export').disabled=true;
    $('lobby-count').textContent='Choose Load official lobby to read this saved game.';
    $('lobby-summary').innerHTML='';
    $('lobby-team-table').innerHTML='';$('lobby-player-table').innerHTML='';
