@@ -902,6 +902,7 @@
   $('weapon-sort').addEventListener('change',renderWeaponInsights);
   $('weapon-search').addEventListener('input',renderWeaponInsights);
   window.WeaponExplorer?.init();
+  window.ClanWeaponBoard?.init();
   var hash=location.hash.slice(1);
   var sharedName=null,sharedPlatform=null;
   if(hash.startsWith('player/')){

@@ -56,6 +56,31 @@ const server=http.createServer(async(req,res)=>{
   return reply(res,200,{schemaVersion:1,matches:[],count:0});
  // Other pages may read optional endpoints: return a benign synthetic empty
  // payload rather than polluting the Chrome console with fixture 404 errors.
+ if(uri.pathname==='/api/public-insights'&&uri.searchParams.get('route')==='clan-weapons')
+  return reply(res,200,{
+    schemaVersion:1,kind:'clan-weapons',verifiedMembers:2,resolvedConsoleAccounts:2,
+    cachedMasteryPlayers:2,contributingPlayers:2,oldestSavedAt:'2026-11-05T10:00:00Z',
+    newestSavedAt:'2026-11-07T09:00:00Z',
+    note:'Real saved, source-isolated clan weapon report, no PUBG requests',
+    weapons:[
+      {name:'M416',playersWithRecord:2,sources:{
+        official:{players:2,metrics:{
+          kills:{value:31,observed:2},damage:{value:3300,observed:2},
+          headshots:{value:5,observed:1},longestKill:{value:340,observed:2}},
+          leaders:[{name:'Sample Member',platform:'xbox',kills:20,damage:2050},
+            {name:'Teammate',platform:'psn',kills:11,damage:1250}]},
+        competitive:{players:2,metrics:{kills:{value:9,observed:2}},
+          leaders:[{name:'Teammate',platform:'psn',kills:6}]},
+        total:{players:2,metrics:{kills:{value:1600,observed:2}},leaders:[]}
+      }},
+      {name:'BerylM762',playersWithRecord:1,sources:{
+        official:{players:1,metrics:{kills:{value:0,observed:1}},
+          leaders:[{name:'Sample Member',platform:'xbox',kills:0}]},
+        competitive:{players:0,metrics:{},leaders:[]},
+        total:{players:1,metrics:{kills:{value:100,observed:1}},leaders:[]}
+      }}
+    ]
+  });
  if(uri.pathname.startsWith('/api/'))return reply(res,200,{
   schemaVersion:1,items:[],matches:[],rows:[],entries:[],error:'No synthetic records'
  });
@@ -113,6 +138,13 @@ async function run(){
    await click(page,'sources');
    assert.ok(await page.locator('#dictionary-kind option').count()>0);
    await click(page,'survival');
+
+   await click(page,'weapons');
+   await page.locator('#clan-weapon-load').click();
+   await page.waitForFunction(()=>document.getElementById('clan-weapon-rows')?.textContent.includes('M416'));
+   assert.match(await page.locator('#clan-weapon-coverage').innerText(),/Saved mastery responses: 2/);
+   assert.match(await page.locator('#clan-weapon-leaders').innerText(),/Sample Member/);
+
    await page.waitForFunction(()=>document.getElementById('survival-data')
     .textContent.includes('14,000'));
    assert.deepEqual(errors,[],'Browser console errors at '+width+'px');

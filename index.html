@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/full-stats.css">
 <link rel="stylesheet" href="/assets/weapon-explorer.css">
+<link rel="stylesheet" href="/assets/clan-weapon-board.css">
 <link rel="stylesheet" href="/assets/match-lab.css">
 <link rel="stylesheet" href="/assets/clan-match-board.css">
 <link rel="stylesheet" href="/assets/clan-activity-pulse.css">
@@ -25,6 +26,7 @@
 <script defer src="/assets/cache-health.js"></script>
 <script defer src="/assets/full-stats.js"></script>
 <script defer src="/assets/weapon-explorer.js"></script>
+<script defer src="/assets/clan-weapon-board.js"></script>
 <script defer src="/assets/match-lab.js"></script>
 <script defer src="/assets/clan-match-board.js"></script>
 <script defer src="/assets/clan-activity-pulse.js"></script>
@@ -408,6 +410,40 @@
         </div>
         <p class="small muted weapon-download-hint">The export contains only sanitized statistics shown above, in the chosen source category. Deprecated mastery medals are not used to calculate performance. The PUBG data library can show additional safe fields from the original saved response.</p>
       </div>
+
+      <section class="card panel clan-weapon-panel" aria-labelledby="clan-weapon-title">
+        <div class="panel-heading"><div>
+          <p class="eyebrow subtle">VERIFIED CLAN · SAVED PUBG MASTERY</p>
+          <h2 id="clan-weapon-title">Clan weapon comparisons</h2>
+        </div><span class="chip">ZERO PUBG REQUESTS</span></div>
+        <p class="small muted clan-weapon-intro">Compare genuine mastery records across verified Xbox and PlayStation clan accounts. A report loads only when requested; it reuses already saved mastery and does not refresh PUBG. Every weapon field includes its own observed-player count. Separate Official and Competitive post-18.2 sources are never added to frozen legacy totals.</p>
+        <div class="filters">
+          <button type="button" class="primary" id="clan-weapon-load">Load clan weapon report</button>
+          <label>Mastery source <select id="clan-weapon-source">
+            <option value="official">Official · since update 18.2</option>
+            <option value="competitive">Competitive · since update 18.2</option>
+            <option value="total">Legacy · frozen at 18.2</option>
+          </select></label>
+          <label>Sort weapons <select id="clan-weapon-sort">
+            <option value="kills">Observed kills</option><option value="players">Players with data</option>
+            <option value="damage">Damage dealt</option><option value="headshots">Headshot kills</option>
+            <option value="knocks">Knockdowns</option><option value="defeats">Defeats</option>
+            <option value="longestKill">Longest kill</option>
+          </select></label>
+          <label>Find weapon <input type="search" id="clan-weapon-search" placeholder="Search saved weapons" maxlength="100"></label>
+          <button type="button" class="secondary" id="clan-weapon-export">↓ Export displayed CSV</button>
+        </div>
+        <p id="clan-weapon-status" class="small muted" aria-live="polite">Load the verified clan's existing mastery records to compare weapons and player rankings.</p>
+        <div id="clan-weapon-summary" class="clan-weapon-summary" aria-label="Observed mastery coverage"></div>
+        <p id="clan-weapon-coverage" class="small muted clan-weapon-coverage" aria-live="polite">No clan mastery report loaded.</p>
+        <div class="scroll-table"><table><thead><tr>
+          <th>WEAPON</th><th>PLAYERS</th><th>KILLS</th><th>HEADSHOTS</th><th>KNOCKS</th><th>DAMAGE</th><th>DEFEATS</th><th>LONGEST KILL</th>
+        </tr></thead><tbody id="clan-weapon-rows"></tbody></table></div>
+        <div id="clan-weapon-leaders" class="clan-weapon-leaders" aria-live="polite">
+          <p class="small muted">Choose a weapon to inspect the top five verified members with observed kills for this source.</p>
+        </div>
+        <p class="small muted">Source caution: a larger total can reflect more cached players or older refresh timestamps, not a fair skill comparison. Missing fields display as unavailable; source snapshots do not establish a complete clan weapon history.</p>
+      </section>
     </section>
 
     <section class="page" id="page-season" hidden>

@@ -1,0 +1,17 @@
+/* Verified clan weapon comparison; all selectors live inside the Weapons panel. */
+.clan-weapon-panel{margin-top:22px}
+.clan-weapon-intro{max-width:950px}
+.clan-weapon-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,195px),1fr));gap:12px;margin:18px 0}
+.clan-weapon-kpi{padding:16px;border:1px solid #37536a;border-radius:12px;background:#16283d;min-width:0}
+.clan-weapon-kpi small{display:block;color:#a3b8d1;font-size:11px;margin-bottom:8px}
+.clan-weapon-kpi strong{font-size:22px;font-weight:800;color:var(--mint,#6fe2d3);overflow-wrap:anywhere}
+.clan-weapon-choose{border:0;background:transparent;color:var(--mint,#70e7d1);padding:5px 0;text-align:left;font-weight:800;cursor:pointer}
+.clan-weapon-choose:hover,.clan-weapon-choose:focus-visible{text-decoration:underline}
+.clan-weapon-count{display:block;color:#98aecd;font-size:10px;margin-top:2px}
+.clan-weapon-selected{background:#29425970}
+.clan-weapon-coverage{line-height:1.8}
+.clan-weapon-leaders{padding:18px;margin-top:18px;border:1px solid #36506b;border-radius:12px;background:#0d1a2d}
+.clan-weapon-leaders h3{font-size:19px;margin:0 0 12px}
+.clan-weapon-leaders table{min-width:650px}
+.clan-weapon-panel .scroll-table{margin-top:12px}
+@media(max-width:740px){.clan-weapon-panel .filters{align-items:stretch}.clan-weapon-panel .filters label{min-width:0;flex:1 1 145px}.clan-weapon-leaders{padding:12px}}

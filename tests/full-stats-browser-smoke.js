@@ -242,6 +242,31 @@ const server=http.createServer(async(req,res)=>{
      official:{kills:31,headshots:12,damage:3000,longestKill:210},
      competitive:{kills:5},total:{kills:3,damage:500}}
    ]});
+ if(uri.pathname==='/api/public-insights'&&uri.searchParams.get('route')==='clan-weapons')
+  return respond(res,200,{
+    schemaVersion:1,kind:'clan-weapons',verifiedMembers:2,resolvedConsoleAccounts:2,
+    cachedMasteryPlayers:2,contributingPlayers:2,oldestSavedAt:'2026-11-05T10:00:00Z',
+    newestSavedAt:'2026-11-07T09:00:00Z',
+    note:'Real saved, source-isolated clan weapon report, no PUBG requests',
+    weapons:[
+      {name:'M416',playersWithRecord:2,sources:{
+        official:{players:2,metrics:{
+          kills:{value:31,observed:2},damage:{value:3300,observed:2},
+          headshots:{value:5,observed:1},longestKill:{value:340,observed:2}},
+          leaders:[{name:'Sample Member',platform:'xbox',kills:20,damage:2050},
+            {name:'Teammate',platform:'psn',kills:11,damage:1250}]},
+        competitive:{players:2,metrics:{kills:{value:9,observed:2}},
+          leaders:[{name:'Teammate',platform:'psn',kills:6}]},
+        total:{players:2,metrics:{kills:{value:1600,observed:2}},leaders:[]}
+      }},
+      {name:'BerylM762',playersWithRecord:1,sources:{
+        official:{players:1,metrics:{kills:{value:0,observed:1}},
+          leaders:[{name:'Sample Member',platform:'xbox',kills:0}]},
+        competitive:{players:0,metrics:{},leaders:[]},
+        total:{players:1,metrics:{kills:{value:100,observed:1}},leaders:[]}
+      }}
+    ]
+  });
  if(uri.pathname.startsWith('/api/'))return respond(res,200,{
   schemaVersion:1,items:[],history:[],matches:[],rows:[],points:[]});
  if(uri.pathname==='/favicon.ico'){res.writeHead(204);return res.end();}
@@ -505,6 +530,17 @@ async function run(){
    await page.locator('#weapon-search').fill('Beryl');
    assert.equal(await page.locator('#weapons-table tr').count(),1);
    assert.match(await page.locator('#weapon-summary').innerText(),/Weapons returned/);
+
+   await page.locator('#clan-weapon-load').click();
+   await page.waitForFunction(()=>document.getElementById('clan-weapon-rows')?.textContent.includes('M416'));
+   assert.match(await page.locator('#clan-weapon-coverage').innerText(),/Saved mastery responses: 2/);
+   assert.match(await page.locator('#clan-weapon-leaders').innerText(),/Sample Member/);
+   await page.locator('#clan-weapon-source').selectOption('competitive');
+   assert.match(await page.locator('#clan-weapon-rows').innerText(),/9/);
+   await page.locator('#clan-weapon-search').fill('Beryl');
+   assert.equal(await page.locator('#clan-weapon-rows tr').count(),1);
+   await page.locator('#clan-weapon-search').fill('');
+
    await page.locator('[data-page="health"]').click();
    await page.locator('#page-health').waitFor({state:'visible'});
    await page.waitForFunction(()=>document.getElementById('health-backfill-table')?.

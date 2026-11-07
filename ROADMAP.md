@@ -33,7 +33,8 @@
 - [ ] Player search across tracked accounts with consent/public visibility policy
 - [x] Add real advanced lifetime profile metrics and per-mode comparisons (damage, headshots, assists, knockdowns, revives and Top 10s)
 - [x] Add real cached weapon-mastery table, level/tier/XP, detailed stats and visual kill bars
-- [ ] Expand weapon-mastery coverage across clan players and additional advanced charts
+- [x] Read-only verified-clan weapon comparison by saved Official/Competitive/legacy source: observed metric coverage, totals and maximum longest kills, searchable weapon ranking, top-five real player lists, source-safe CSV, on-demand load, and no extra PUBG requests.
+- [ ] Expand historical weapon-mastery collection to more verified players only through the existing shared PUBG budget; observe real cache coverage before claiming completion.
 - [x] Shareable console player links (`/#player/xbox/<name>` or `/#player/psn/<name>`) and per-player detail panels
 - [x] Real daily snapshots from all PUBG player updates, including baseline captured at the real last-fetch timestamp
 - [x] Read-only private-table-backed history API for saved console players, without revealing database IDs
