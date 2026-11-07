@@ -11,6 +11,8 @@ create table if not exists public.clan_membership_audit (
     check (length(gamertag) between 1 and 100),
   action text not null
     check (action in ('add', 'remove')),
+  outcome text not null
+    check (outcome in ('added','removed','unchanged','not_found','ambiguous')),
   previous_membership boolean not null,
   current_membership boolean not null,
   observed_status text not null,
@@ -73,6 +75,13 @@ begin
   from public.player_import_queue
   where pg_catalog.lower(gamertag) = pg_catalog.lower(p_gamertag);
   if matches > 1 then
+    insert into public.clan_membership_audit(
+      interaction_id,actor_discord_id,guild_id,gamertag,action,outcome,
+      previous_membership,current_membership,observed_status
+    ) values (
+      p_interaction_id,p_actor_discord_id,p_guild_id,p_gamertag,p_action,'ambiguous',
+      false,false,'ambiguous'
+    );
     return pg_catalog.jsonb_build_object('status','ambiguous');
   end if;
 
@@ -83,6 +92,13 @@ begin
   desired := p_action='add';
   if existing.id is null then
     if not desired then
+      insert into public.clan_membership_audit(
+        interaction_id,actor_discord_id,guild_id,gamertag,action,outcome,
+        previous_membership,current_membership,observed_status
+      ) values (
+        p_interaction_id,p_actor_discord_id,p_guild_id,p_gamertag,p_action,'not_found',
+        false,false,'untracked'
+      );
       return pg_catalog.jsonb_build_object('status','not_found');
     end if;
     -- A new manager-approved clan name is UNVERIFIED until the existing
@@ -96,6 +112,13 @@ begin
   else
     previous := existing.is_clan_member;
     if previous=desired then
+      insert into public.clan_membership_audit(
+        interaction_id,actor_discord_id,guild_id,gamertag,action,outcome,
+        previous_membership,current_membership,observed_status
+      ) values (
+        p_interaction_id,p_actor_discord_id,p_guild_id,existing.gamertag,p_action,
+        'unchanged',previous,desired,existing.status
+      );
       return pg_catalog.jsonb_build_object(
         'status','unchanged','gamertag',existing.gamertag,
         'isClanMember',previous,'verification',existing.status,
@@ -107,14 +130,14 @@ begin
     where id=existing.id returning * into existing;
   end if;
 
+  outcome := case when desired then 'added' else 'removed' end;
   insert into public.clan_membership_audit(
-    interaction_id,actor_discord_id,guild_id,gamertag,action,
+    interaction_id,actor_discord_id,guild_id,gamertag,action,outcome,
     previous_membership,current_membership,observed_status
   ) values (
     p_interaction_id,p_actor_discord_id,p_guild_id,existing.gamertag,
-    p_action,previous,desired,existing.status
+    p_action,outcome,previous,desired,existing.status
   );
-  outcome := case when desired then 'added' else 'removed' end;
   return pg_catalog.jsonb_build_object(
     'status',outcome,'gamertag',existing.gamertag,
     'isClanMember',desired,'verification',existing.status,
