@@ -222,8 +222,8 @@ test('retained 180-day full lobby migration is private and source-allowlisted',(
  assert.match(sql,/public\.players p/);
  assert.match(sql,/p\.pubg_account_id/);
  assert.match(sql,/interval '180 days'/);
- assert.match(sql,/jsonb_build_object\('type','participant'/);
- assert.match(sql,/jsonb_build_object\('type','roster'/);
+ assert.match(sql,/jsonb_build_object\(\s*'type','participant'/);
+ assert.match(sql,/jsonb_build_object\(\s*'type','roster'/);
  assert.match(sql,/prune_pubg_match_lobby_archive/);
  assert.doesNotMatch(sql,/('URL'|'token'|'telemetryUrl'|'secretAPIKey')\s*,/);
  const sync=fs.readFileSync(path.join(__dirname,'../api/sync.js'),'utf8');
