@@ -61,7 +61,7 @@ test('map, mode and genuine-date window filters use source timestamps only',()=>
  assert.equal(d.matchesAnalysed,2);
  assert.equal(d.undatedMatches,0);
  assert.equal(d.rivals.find(r=>r.name==='Rival A').matchesSampled,2);
- const m=analyseSavedRivals(rows,own,{map:'Baltic_Main',mode:'squad',days:30},now);
+ const m=analyseSavedRivals(rows,own,{map:'Baltic_Main',mode:'squad',days:7},now);
  assert.equal(m.matchesAnalysed,1);
  assert.equal(m.rivals[0].kills,1);
  assert.equal(m.rivals[0].damageDealt,83);
