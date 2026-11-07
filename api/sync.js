@@ -84,6 +84,17 @@ module.exports = async (req, res) => {
     console.error('Archive maintenance unavailable:',error.message);
     result.archive={status:'prune_failed'};
   }
+  // Retain sanitized real match lobbies for 180 days; leave the original
+  // per-player archive and temporary PUBG cache lifecycle independent.
+  try {
+    const trimmed=await db.rpc('prune_pubg_match_lobby_archive');
+    result.matchLobbyArchive=trimmed.error?{status:'prune_failed'}:
+      {status:'ok',removed:Number(trimmed.data)||0};
+    if(trimmed.error)console.error('Match lobby prune failed:',trimmed.error.message);
+  }catch(error){
+    console.error('Match lobby archive maintenance unavailable:',error.message);
+    result.matchLobbyArchive={status:'prune_failed'};
+  }
   // Purge compact season/ranked observations older than 18 months.
   // Runs through the existing secret-protected daily Vercel cron.
   try {
