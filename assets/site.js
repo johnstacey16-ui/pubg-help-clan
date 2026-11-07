@@ -311,6 +311,7 @@
     $('match-note').textContent='Reading saved console match data for '+name+'…';
     $('match-results').innerHTML='';
     window.MatchLab?.reset();
+    window.MatchLobby?.matchesChanged(name,[]);
     if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,[]);
     try{
       var response=await fetch('/api/public-matches?name='+encodeURIComponent(name),{
@@ -322,6 +323,7 @@
       if(result.schemaVersion!==1||!Array.isArray(result.matches))throw Error('Unexpected match schema');
       if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,result.matches);
       window.MatchLab?.render(result);
+      window.MatchLobby?.matchesChanged(name,result.matches);
       $('match-note').textContent=(result.note||'Saved PUBG matches only')+
         ' · '+result.availableCount+' detailed match(es) stored'+
         (result.archivedCount?' · '+result.archivedCount+' archived':'');
@@ -861,6 +863,7 @@
   $('match-player').addEventListener('change',function(e){matchName=e.target.value;loadCachedMatches();});
   $('match-reload').addEventListener('click',loadCachedMatches);
   window.MatchLab?.init();
+  window.MatchLobby?.init();
   window.SquadChemistry?.init();
   window.ClanRecordBook?.init();
   window.ClanActivityPulse?.init();
