@@ -127,8 +127,8 @@ test('frontend filters real squad members and does not alter observed team value
  assert.match(csv,/Our Hero/);
  assert.match(csv,/Unnamed participant/);
  assert.doesNotMatch(csv,/PRIVATE|account\.|roster-one/);
- assert.equal(csvCell('=HYPERLINK("bad")'),'\"\\'=HYPERLINK(\"\"bad\"\")\"');
- assert.equal(csvCell('  +1'),'\"\\'  +1\"');
+ assert.equal(csvCell('=HYPERLINK("bad")'),`"'=HYPERLINK(""bad"")"`);
+ assert.equal(csvCell('  +1'),`"'  +1"`);
 });
 test('both dashboard entry points load the same optional match lobby',()=>{
  const root=path.resolve(__dirname,'..'),read=p=>
