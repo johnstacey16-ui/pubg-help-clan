@@ -1,6 +1,6 @@
 'use strict';
 // Official saved PUBG match-lobby scoreboard. No upstream request is triggered.
-// The full lobby is optional because its cache can expire before the 180-day archive.
+// The full lobby can be loaded from either the short-lived cache or sanitized 180-day lobby archive.
 (function(root,factory){
  const api=factory();
  if(typeof module==='object'&&module.exports)module.exports=api;
@@ -52,7 +52,7 @@
   $('lobby-load').disabled=!name||!matches.length;
   $('lobby-export').disabled=true;
   $('lobby-status').textContent=matches.length?
-   'Select a saved match and choose Load official lobby. Full-lobby records may be unavailable for older archived games.':
+   'Select a saved match and choose Load official lobby. Source-verified full lobbies are retained for up to 180 days. Older matches without a captured source remain unavailable.':
    'No saved match summaries for this player. Select Refresh recent above.';
   $('lobby-summary').innerHTML='';
   $('lobby-team-table').innerHTML='';
@@ -147,7 +147,8 @@
    report=result;
    $('lobby-export').disabled=false;
    $('lobby-status').textContent=result.map+' · '+result.mode+' · '+
-    date(result.playedAt)+' · saved '+date(result.savedAt)+
+    date(result.playedAt)+' · '+(result.archived?'retained lobby archive':'saved match cache')+
+    ' · source saved '+date(result.savedAt)+
     '. '+result.note;
    paint();
   }catch(error){
