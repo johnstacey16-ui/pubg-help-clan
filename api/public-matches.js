@@ -24,7 +24,9 @@ module.exports=async(req,res)=>{
       route==='clan-records'?await publicClanMatchRecords(db,req.query?.days):
       route==='clan-board'?await publicClanMatchBoard(db,req.query?.days):
       route==='telemetry'?await publicTelemetry(db,{name,match:req.query?.match}):
-      route==='rivals'?await publicRivalTrends(db,{name}):
+      route==='rivals'?await publicRivalTrends(db,{name,
+        days:req.query?.days,map:req.query?.map,mode:req.query?.mode,
+        opponent:req.query?.opponent}):
       await cachedPlayerMatches(db,name);
     if(route)res.setHeader('Cache-Control','private, no-store');
     if(result.body?.retryAfterSeconds)res.setHeader('Retry-After',String(result.body.retryAfterSeconds));
