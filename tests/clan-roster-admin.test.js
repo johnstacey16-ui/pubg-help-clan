@@ -111,12 +111,12 @@ test('status queries are exact-case-insensitive and do not expose account IDs',a
 });
 test('audit response is private, bounded and has no raw member ids or tokens',async()=>{
  const db=fakeDb({history:[{
-  gamertag:'@everyone_a',action:'add',
+  gamertag:'@everyone_a',action:'add',outcome:'added',
   actor_discord_id:actor,previous_membership:false,
   current_membership:true,occurred_at:'2026-11-07T13:00:00Z'
  }]});
  const reply=await admin.command(db,message('audit'));
- assert.match(reply,/Last 1 clan roster change/);
+ assert.match(reply,/Last 1 clan roster admin attempt/);
  assert.match(reply,/…5678/);
  assert.doesNotMatch(reply,/<@|123456789012345678/);
  assert.match(reply,/@\u200beveryone/);
@@ -139,6 +139,8 @@ test('migration uses only service role with append-only evidence and preserved s
  assert.match(sql,/to service_role/);
  assert.match(sql,/pg_advisory_xact_lock/);
  assert.match(sql,/duplicate_event/);
+ assert.match(sql,/outcome text not null/);
+ assert.match(sql,/\x27unchanged\x27,previous,desired,existing.status/);
  assert.match(sql,/update public\.player_import_queue set is_clan_member=desired/);
  assert.doesNotMatch(sql,/delete from public\.(?:players|player_import_queue)/i);
  const router=fs.readFileSync(path.join(__dirname,'../api/index.js'),'utf8');
