@@ -100,6 +100,8 @@ test('free Hobby Vercel deployment stays within 12 serverless function builds',(
   assert.match(read('training/index.html'),new RegExp('id="'+id+'"'));
  assert.match(read('training/js/clan-dashboard-loader.js'),/assets\/clan-match-board\.js/);
  assert.match(matches,/publicClanMatchRecords/);
+ assert.match(matches,/publicMatchLobby/);
+ assert.match(read('training/js/clan-dashboard-loader.js'),/assets\/match-lobby\.js/);
  assert.match(read('assets/clan-record-book.js'),/route=clan-records/);
  assert.match(read('training/js/clan-dashboard-loader.js'),/assets\/clan-record-book\.js/);
  for(const id of ['clan-record-days','clan-record-kpis','clan-record-metrics',
