@@ -83,7 +83,9 @@
 - [ ] Confirm trigger archiving on the next newly retrieved PUBG match in production
 - [x] Archived match details and squad breakdown on the website
 - [x] Official cached full-lobby viewer for verified saved console-player matches: recorded squad placements, all source participant stats, team aggregates with per-field coverage, searchable player scoreboard and formula-safe CSV; no additional PUBG calls, IDs, secrets or fabricated missing lobbies.
-- [ ] Validate saved full-lobby coverage against actual current production match caches. The longer-lived 180-day personal archive alone cannot reconstruct full opponents or squad rosters.
+- [x] Retain sanitized official full-match squad and participant observations for up to 180 days beyond the ordinary 30-day match cache, with verified account participation, bounded compact storage, RLS/service-only access, existing saved-match trigger, and authenticated daily pruning. No PUBG API calls, telemetry URLs or synthetic team reconstructions.
+- [x] Initial production backfill on 2026-11-07: all 1,540 available genuine saved full-match payloads retained in the new sanitized archive, using about 28 MB. The scan confirmed zero URL/token/secret fields in archived source data; the archive RPC is service-role-only.
+- [ ] Verify that the next newly saved official match automatically enters the compact 180-day archive and that the existing daily cron prunes expired rows. Pre-existing expired source reports cannot be reconstructed.
 - [x] Recurring teammate analysis from real archived squads (games, wins, kills, damage and last played)
 - [x] Verified, cache-only telemetry Rival Intelligence: observed opponent encounter counts, map/mode/date filters, searchable and sortable visible-name lists, per-metric damage coverage, and bounded match-by-match source-only drilldowns. Uses only already analysed telemetry and never assumes matching display names confirm account identity.
 - [ ] Verify multiple genuine production telemetry reports and the resulting opponent trend/drilldowns on actual records; missing stored analyses must remain an honest empty state.

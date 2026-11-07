@@ -28,19 +28,27 @@ const record={
   {type:'asset',attributes:{URL:'https://telemetry-cdn.pubg.com/private.json'}},
   {type:'secret',token:'LEAK'}
  ]};
-function db({missing=false,mismatch=false,playerKnown=true}={}){
+function db({missing=false,mismatch=false,playerKnown=true,archive=null,
+  archivedPlayedAt='2026-11-07T10:00:00Z'}={}){
  const calls=[];
  return{calls,from(table){calls.push(table);return{
   select(){return this;},ilike(){return this;},eq(){return this;},
+  gte(){return this;},
   limit:async()=>({error:null,data:playerKnown?[{
    gamertag:'Our Hero',platform:'xbox',pubg_account_id:ACCOUNT
   }]:[]}),
-  maybeSingle:async()=>({error:null,data:missing?null:{
-   payload:mismatch?{...record,included:record.included.slice(2)}:record,
-   fetched_at:'2026-11-07T12:00:00Z'
-  }})
+  maybeSingle:async()=>({error:null,data:
+   table==='pubg_endpoint_cache'?missing?null:{
+    payload:mismatch?{...record,included:record.included.slice(2)}:record,
+    fetched_at:'2026-11-07T12:00:00Z'
+   }:
+   table==='pubg_match_lobby_archive'&&archive?{
+    compact_match:archive,source_fetched_at:'2026-11-07T12:00:00Z',
+    archived_at:'2026-11-07T15:00:00Z',played_at:archivedPlayedAt
+   }:null})
  };}};
 }
+
 test('official lobby shapes rosters, team rank and player stats from the source',()=>{
  const response=shapeLobby(record,ACCOUNT,MATCH,'2026-11-07T12:00:00Z');
  assert.equal(response.schemaVersion,1);
@@ -88,6 +96,7 @@ test('verified console participant can inspect saved lobby with no extra budget 
  assert.equal(r.status,200);
  assert.equal(r.body.player,'Our Hero');
  assert.equal(r.body.teams.length,3);
+ assert.equal(r.body.archived,false);
  assert.deepEqual(client.calls,['players','pubg_endpoint_cache']);
  assert.doesNotMatch(JSON.stringify(r.body),/pubg_account_id|account\.|PRIVATE/);
 });
@@ -149,4 +158,75 @@ test('both dashboard entry points load the same optional match lobby',()=>{
  assert.match(read('api/public-matches.js'),/publicMatchLobby/);
  assert.match(read('package.json'),/node --check lib\/web-match-lobby\.js/);
  assert.doesNotMatch(read('assets/match-lobby.js'),/SUPABASE_SERVICE_KEY|PUBG_API_KEY|DISCORD_BOT_TOKEN/);
+});
+
+test('older legitimate saved match falls back to 180-day sanitized full-lobby source',async()=>{
+ const dbClient=db({missing:true,archive:record});
+ const reply=await publicMatchLobby(dbClient,{name:'Our Hero',match:MATCH});
+ assert.equal(reply.status,200);
+ assert.equal(reply.body.archived,true);
+ assert.match(reply.body.source,/180-day/);
+ assert.equal(reply.body.teamsShown,3);
+ assert.equal(reply.body.teams.find(t=>t.isOwnTeam).players.length,2);
+ assert.equal(reply.body.archivedAt,'2026-11-07T15:00:00Z');
+ assert.deepEqual(dbClient.calls,['players','pubg_endpoint_cache',
+  'pubg_match_lobby_archive']);
+ assert.doesNotMatch(JSON.stringify(reply.body),
+  /account\.|PRIVATE|telemetry-cdn|teamId|roster-one|playerId|secretAPIKey/);
+});
+test('cached report wins over archived duplicates and does not read archive',async()=>{
+ const dbClient=db({archive:record});
+ const reply=await publicMatchLobby(dbClient,{name:'Our Hero',match:MATCH});
+ assert.equal(reply.status,200);
+ assert.equal(reply.body.archived,false);
+ assert.deepEqual(dbClient.calls,['players','pubg_endpoint_cache']);
+});
+test('an archived match without proof of the selected PUBG account is never shown',async()=>{
+ const outsider={...record,included:record.included.slice(2)};
+ const dbClient=db({missing:true,archive:outsider});
+ const reply=await publicMatchLobby(dbClient,{name:'Our Hero',match:MATCH});
+ assert.equal(reply.status,404);
+ assert.deepEqual(dbClient.calls,['players','pubg_endpoint_cache',
+  'pubg_match_lobby_archive']);
+});
+test('archive query enforces actual 180-day match age and exact match-id equality',async()=>{
+ const filters=[];
+ const client=db({missing:true,archive:record});
+ const original=client.from;
+ client.from=function(table){
+  const q=original.call(this,table);
+  const eq=q.eq,gte=q.gte;
+  q.eq=function(field,value){filters.push([table,field,value]);return eq.call(this,field,value);};
+  q.gte=function(field,value){filters.push([table,field,value]);return gte.call(this,field,value);};
+  return q;
+ };
+ const reply=await publicMatchLobby(client,{name:'Our Hero',match:MATCH});
+ assert.equal(reply.status,200);
+ assert.deepEqual(filters.filter(x=>x[0]==='pubg_match_lobby_archive')
+  .map(x=>x[1]),['match_id','played_at']);
+ assert.equal(filters.find(x=>x[1]==='match_id')[2],MATCH);
+ const cutoff=Date.parse(filters.find(x=>x[1]==='played_at')[2]);
+ assert.ok(Math.abs(cutoff-(Date.now()-180*86400_000))<60000);
+});
+test('retained 180-day full lobby migration is private and source-allowlisted',()=>{
+ const sql=fs.readFileSync(path.join(__dirname,
+  '../supabase/migrations/20261107_compact_official_match_lobby_retention.sql'),'utf8');
+ assert.match(sql,/create table if not exists public\.pubg_match_lobby_archive/);
+ assert.match(sql,/enable row level security/);
+ assert.match(sql,/revoke all on table public\.pubg_match_lobby_archive/);
+ assert.match(sql,/grant select,insert,update,delete.*to service_role/s);
+ assert.match(sql,/security invoker/);
+ assert.match(sql,/archive_verified_clan_match\(new\.payload\)/);
+ assert.match(sql,/archive_saved_pubg_match_lobby\(new\.payload,new\.fetched_at\)/);
+ assert.match(sql,/source_fetched_at/);
+ assert.match(sql,/public\.players p/);
+ assert.match(sql,/p\.pubg_account_id/);
+ assert.match(sql,/interval '180 days'/);
+ assert.match(sql,/jsonb_build_object\(\s*'type','participant'/);
+ assert.match(sql,/jsonb_build_object\(\s*'type','roster'/);
+ assert.match(sql,/prune_pubg_match_lobby_archive/);
+ assert.doesNotMatch(sql,/('URL'|'token'|'telemetryUrl'|'secretAPIKey')\s*,/);
+ const sync=fs.readFileSync(path.join(__dirname,'../api/sync.js'),'utf8');
+ assert.match(sync,/db\.rpc\('prune_pubg_match_lobby_archive'\)/);
+ assert.doesNotMatch(sync,/matchLobbyArchive.*fetch\(/s);
 });

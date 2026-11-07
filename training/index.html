@@ -785,7 +785,7 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
           <p class="eyebrow subtle">OFFICIAL SAVED MATCH · FULL LOBBY</p>
           <h2 id="lobby-title">Match Lobby & Squad Scoreboard</h2>
         </div><span class="chip">NO PUBG REQUESTS</span></div>
-        <p class="small muted lobby-intro">View the genuine player and squad statistics in a previously retrieved PUBG match. Open any saved game below or choose it here; the full lobby must still exist in the short-lived match cache. The 180-day personal archive cannot reconstruct missing opponents or teams. Missing values remain unavailable and roster placement is taken only from official PUBG roster ranks.</p>
+        <p class="small muted lobby-intro">View the genuine player and squad statistics in a previously retrieved PUBG match. Open any saved game below or choose it here; the sanitized full lobby is now retained for up to 180 days when an official source was captured. Earlier archive-only player summaries still cannot reconstruct missing opponents or teams. Missing values remain unavailable and roster placement is taken only from official PUBG roster ranks.</p>
         <div class="filters">
           <label>Saved match <select id="lobby-match"></select></label>
           <button class="primary" type="button" id="lobby-load" disabled>Load official lobby</button>
@@ -815,7 +815,7 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
           <th>PLAYER</th><th>SQUAD</th><th>PLACE</th><th>KILLS</th><th>KNOCKS</th>
           <th>DAMAGE</th><th>HEADSHOTS</th><th>ASSISTS</th><th>SURVIVED</th><th>DEATH TYPE</th>
         </tr></thead><tbody id="lobby-player-table"></tbody></table></div>
-        <p class="small muted lobby-footnote">All figures are from saved official PUBG match participants, not telemetry estimates. The participant CSV uses safe spreadsheet cells. Squad totals show their observed-member sample counts, and player filters do not imply that unseen members were absent. Complete lobbies may not be retained as long as a personal match summary.</p>
+        <p class="small muted lobby-footnote">All figures are from saved official PUBG match participants, not telemetry estimates. The participant CSV uses safe spreadsheet cells. Squad totals show their observed-member sample counts, and player filters do not imply that unseen members were absent. Lobbies without a genuine saved original source cannot be reconstructed retroactively.</p>
       </section>
 
       <details class="telemetry-opt-in" id="telemetry-opt-in">
