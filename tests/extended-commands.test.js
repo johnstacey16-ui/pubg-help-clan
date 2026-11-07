@@ -6,11 +6,11 @@ const core = require('../lib/commands-core');
 const extra = require('../lib/commands-extra');
 const { matchEndpoint } = require('../lib/pubg-endpoints');
 
-test('all sixteen Discord commands have unique names and valid required-option order', () => {
-  assert.equal(commands.length, 16);
+test('all seventeen Discord commands have unique names and valid required-option order', () => {
+  assert.equal(commands.length, 17);
   assert.equal(new Set(commands.map(x => x.name)).size, commands.length);
   const names = new Set(commands.map(x => x.name));
-  for (const name of ['stats','leaderboard','roster','help','clan',
+  for (const name of ['stats','leaderboard','roster','clanmanage','help','clan',
     'compare','modes','recent','match','squad','teammates','mastery','season','ranked','dashboard','setup'])
     assert.ok(names.has(name), 'Missing command ' + name);
   for (const cmd of commands) {
@@ -18,7 +18,7 @@ test('all sixteen Discord commands have unique names and valid required-option o
     assert.ok(cmd.description.length <= 100);
     let optionalSeen = false;
     for (const option of cmd.options || []) {
-      if (cmd.name === 'dashboard') {
+      if (cmd.name === 'dashboard' || cmd.name === 'clanmanage') {
         assert.equal(option.type, 1, 'Dashboard options must be subcommands');
         continue;
       }
