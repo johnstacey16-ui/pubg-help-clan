@@ -6,7 +6,7 @@
     '/assets/telemetry-view.js','/assets/global-board.js',
     '/assets/survival-view.js','/assets/cache-health.js',
     '/assets/full-stats.js','/assets/weapon-explorer.js','/assets/clan-weapon-board.js',
-    '/assets/match-lab.js','/assets/clan-match-board.js','/assets/clan-activity-pulse.js',
+    '/assets/match-lab.js','/assets/match-lobby.js','/assets/clan-match-board.js','/assets/clan-activity-pulse.js',
     '/assets/squad-chemistry.js','/assets/clan-record-book.js',
     '/assets/site.js'];
   let running=null;

@@ -1,0 +1,18 @@
+/* Real saved PUBG match roster scoreboard; readable on Xbox, mobile and desktop. */
+.lobby-panel{margin:22px 0;border-color:#36506a}
+.lobby-panel .lobby-intro{max-width:1000px;line-height:1.75}
+.lobby-panel .filters{margin:16px 0}
+.lobby-panel .filters label{flex:1 1 155px;min-width:0}
+.lobby-panel .filters input,.lobby-panel .filters select{width:100%;min-width:0}
+.lobby-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,165px),1fr));gap:11px;margin:18px 0}
+.lobby-kpi{background:#13243a;border:1px solid #38536e;border-radius:12px;padding:14px}
+.lobby-kpi small{display:block;color:#97abc5;font-size:10px;margin-bottom:8px}
+.lobby-kpi strong{font-size:22px;color:var(--mint,#8ce9d9);display:block;overflow-wrap:anywhere}
+.lobby-panel h3{font-size:18px;margin:25px 0 8px}
+.lobby-panel .scroll-table{margin-top:12px}
+.lobby-panel .scroll-table table{min-width:690px}
+.lobby-panel .lobby-own td{background:#29513c45;color:#f1fcff}
+.lobby-coverage{display:block;color:#91a7c0;font-size:10px;margin-top:2px}
+.lobby-count{line-height:1.6;margin-top:12px}
+.lobby-panel .lobby-footnote{line-height:1.75;margin-top:18px}
+@media(max-width:740px){.lobby-panel .filters label{flex:1 1 135px}.lobby-panel .filters input{width:100%}}

@@ -82,6 +82,8 @@
 - [x] Private RLS and verified console-player lookup; public output uses an explicit field allowlist
 - [ ] Confirm trigger archiving on the next newly retrieved PUBG match in production
 - [x] Archived match details and squad breakdown on the website
+- [x] Official cached full-lobby viewer for verified saved console-player matches: recorded squad placements, all source participant stats, team aggregates with per-field coverage, searchable player scoreboard and formula-safe CSV; no additional PUBG calls, IDs, secrets or fabricated missing lobbies.
+- [ ] Validate saved full-lobby coverage against actual current production match caches. The longer-lived 180-day personal archive alone cannot reconstruct full opponents or squad rosters.
 - [x] Recurring teammate analysis from real archived squads (games, wins, kills, damage and last played)
 - [x] Verified, cache-only telemetry Rival Intelligence: observed opponent encounter counts, map/mode/date filters, searchable and sortable visible-name lists, per-metric damage coverage, and bounded match-by-match source-only drilldowns. Uses only already analysed telemetry and never assumes matching display names confirm account identity.
 - [ ] Verify multiple genuine production telemetry reports and the resulting opponent trend/drilldowns on actual records; missing stored analyses must remain an honest empty state.

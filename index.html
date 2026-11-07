@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/assets/weapon-explorer.css">
 <link rel="stylesheet" href="/assets/clan-weapon-board.css">
 <link rel="stylesheet" href="/assets/match-lab.css">
+<link rel="stylesheet" href="/assets/match-lobby.css">
 <link rel="stylesheet" href="/assets/clan-match-board.css">
 <link rel="stylesheet" href="/assets/clan-activity-pulse.css">
 <link rel="stylesheet" href="/assets/squad-chemistry.css">
@@ -28,6 +29,7 @@
 <script defer src="/assets/weapon-explorer.js"></script>
 <script defer src="/assets/clan-weapon-board.js"></script>
 <script defer src="/assets/match-lab.js"></script>
+<script defer src="/assets/match-lobby.js"></script>
 <script defer src="/assets/clan-match-board.js"></script>
 <script defer src="/assets/clan-activity-pulse.js"></script>
 <script defer src="/assets/squad-chemistry.js"></script>
@@ -306,6 +308,45 @@
           <div id="match-results" class="match-results" aria-live="polite"></div>
         </section>
       </div>
+
+      
+      <section class="card panel lobby-panel" id="lobby-panel" aria-labelledby="lobby-title">
+        <div class="panel-heading"><div>
+          <p class="eyebrow subtle">OFFICIAL SAVED MATCH · FULL LOBBY</p>
+          <h2 id="lobby-title">Match Lobby & Squad Scoreboard</h2>
+        </div><span class="chip">NO PUBG REQUESTS</span></div>
+        <p class="small muted lobby-intro">View the genuine player and squad statistics in a previously retrieved PUBG match. Open any saved game below or choose it here; the full lobby must still exist in the short-lived match cache. The 180-day personal archive cannot reconstruct missing opponents or teams. Missing values remain unavailable and roster placement is taken only from official PUBG roster ranks.</p>
+        <div class="filters">
+          <label>Saved match <select id="lobby-match"></select></label>
+          <button class="primary" type="button" id="lobby-load" disabled>Load official lobby</button>
+          <label>Players <select id="lobby-team-scope">
+            <option value="all">All recorded squads</option>
+            <option value="mine">My recorded squad only</option>
+          </select></label>
+          <label>Sort <select id="lobby-sort">
+            <option value="placement">Official squad placement</option>
+            <option value="kills">Recorded kills</option>
+            <option value="damage">Recorded damage</option>
+            <option value="players">Squad size</option>
+          </select></label>
+          <label>Search lobby <input type="search" id="lobby-search" maxlength="100" autocomplete="off" placeholder="Player name…"></label>
+          <button class="secondary" type="button" id="lobby-export" disabled>↓ Export saved lobby CSV</button>
+        </div>
+        <p id="lobby-status" class="small muted" aria-live="polite">Select a saved player above to choose a recorded match.</p>
+        <div id="lobby-summary" class="lobby-summary" aria-label="Observed lobby coverage"></div>
+        <p id="lobby-count" class="small muted lobby-count" aria-live="polite">No full lobby loaded.</p>
+        <h3>Recorded squad standings</h3>
+        <div class="scroll-table"><table><thead><tr>
+          <th>RECORDED PLACE</th><th>SQUAD</th><th>MEMBERS</th>
+          <th>KILLS</th><th>DAMAGE</th><th>KNOCKS</th>
+        </tr></thead><tbody id="lobby-team-table"></tbody></table></div>
+        <h3>Recorded participant scoreboard</h3>
+        <div class="scroll-table"><table><thead><tr>
+          <th>PLAYER</th><th>SQUAD</th><th>PLACE</th><th>KILLS</th><th>KNOCKS</th>
+          <th>DAMAGE</th><th>HEADSHOTS</th><th>ASSISTS</th><th>SURVIVED</th><th>DEATH TYPE</th>
+        </tr></thead><tbody id="lobby-player-table"></tbody></table></div>
+        <p class="small muted lobby-footnote">All figures are from saved official PUBG match participants, not telemetry estimates. The participant CSV uses safe spreadsheet cells. Squad totals show their observed-member sample counts, and player filters do not imply that unseen members were absent. Complete lobbies may not be retained as long as a personal match summary.</p>
+      </section>
 
       <details class="telemetry-opt-in" id="telemetry-opt-in">
         <summary>Optional legacy 2D replay — resource-intensive; closed by default</summary>
