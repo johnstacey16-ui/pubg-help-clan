@@ -113,7 +113,8 @@
 ### Phase 4 — Secure updates and Discord integration
 - [ ] Authenticated manager-only website refresh using existing budget and database lock
 - [x] Discord dashboard **View full dashboard** link
-- [ ] Configurable Discord clan membership management
+- [x] Configurable Discord clan membership management: signed Discord Manage Server `/clanmanage add/remove/status/audit` actions, service-role-only transactional membership toggles and append-only audit with replay protection; the existing shared-budget importer still verifies names before counting them as matched.
+- [ ] Deploy the roster-admin Supabase migration and confirm Discord command registration and real manager actions only after a production Vercel release is authorized; no live membership changes or PUBG fetches in this PR.
 - [x] Audit legacy Supabase grants and secure `players`, `matches`, `clan_records` (RLS enabled; anonymous/authenticated access revoked; service-role preserved)
 - [x] Adapt legacy Command Centre awards, experimental roles, optional clan percentile ratings and What-if policy controls
 - [x] Add an SVG percentile comparison radar based on actual saved mode data
