@@ -810,15 +810,39 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
           <p class="small muted">The analysis may return a bounded sample of events for exceptionally long matches. Event indexes and genuine event times are preserved; no absent events or positions are invented.</p>
         </div>
         <div class="telemetry-rival-trends">
-          <div class="panel-heading"><div><h3>Opponent trends across saved match analyses</h3>
-            <p class="small muted">Compare rivals across distinct saved match reports. No new PUBG fetch and no guessed career totals.</p></div>
-            <button id="telemetry-rivals-refresh" type="button" class="secondary">Read saved rival trends</button>
+          <div class="panel-heading"><div><h3>Rival Intelligence · saved encounters</h3>
+            <p class="small muted">Investigate recorded opponent encounters by map, game mode and date. Calculated only from previously analysed telemetry; no new PUBG or telemetry downloads.</p></div>
+            <button id="telemetry-rivals-refresh" type="button" class="secondary">Read saved rival intelligence</button>
           </div>
-          <p id="telemetry-rivals-note" class="small muted" aria-live="polite">Select a player and read analysed match reports.</p>
+          <div class="filters rival-filters">
+            <label>Observed time window <select id="telemetry-rivals-days">
+              <option value="0" selected>All saved analyses</option>
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="180">Last 180 days</option>
+            </select></label>
+            <label>Map <select id="telemetry-rivals-map"><option value="">All recorded maps</option></select></label>
+            <label>Game mode <select id="telemetry-rivals-mode"><option value="">All recorded modes</option></select></label>
+            <label>Find visible opponent <input id="telemetry-rivals-search" type="search" maxlength="90" autocomplete="off" placeholder="Filter names shown"></label>
+            <label>Sort opponents <select id="telemetry-rivals-sort">
+              <option value="fights">Recorded kills and deaths</option>
+              <option value="matches">Encountered match count</option>
+              <option value="kills">You killed them</option>
+              <option value="deaths">They killed you</option>
+              <option value="damage">Observed damage dealt</option>
+              <option value="latest">Latest recorded encounter</option>
+            </select></label>
+          </div>
+          <p id="telemetry-rivals-note" class="small muted" aria-live="polite">Select a player and read saved match analyses. These are observed samples, not an opponent's complete career record.</p>
+          <p id="telemetry-rivals-count" class="small muted" aria-live="polite">No saved rival report loaded.</p>
           <div class="scroll-table"><table><thead><tr>
-            <th>VISIBLE NAME</th><th>MATCHES OBSERVED</th><th>YOU KILLED</th>
-            <th>THEY KILLED YOU</th><th>DAMAGE DEALT</th><th>DAMAGE TAKEN</th><th>LAST SAVED MATCH</th>
+            <th>VISIBLE NAME · DETAILS</th><th>MATCHES OBSERVED</th><th>YOU KILLED</th>
+            <th>THEY KILLED YOU</th><th>DAMAGE DEALT</th><th>DAMAGE TAKEN</th><th>LAST OBSERVED MATCH</th>
           </tr></thead><tbody id="telemetry-rivals-table"></tbody></table></div>
+          <div id="telemetry-rival-detail" class="telemetry-rival-detail" aria-live="polite">
+            <p class="small muted">Select a visible opponent name to see individual saved match encounters and map context.</p>
+          </div>
+          <p class="small muted rival-caution">Matching visible names across matches does not confirm account identity. Two accounts could share or reuse a name. Only actual logged kills, deaths and damage are counted; unknown damage stays unavailable. Date filters exclude reports without a valid match date.</p>
         </div>
 
         <div class="telemetry-controls">

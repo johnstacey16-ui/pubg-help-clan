@@ -179,6 +179,36 @@ const server=http.createServer(async(req,res)=>{
      survivalObserved:0,survivalSeconds:0,placementTotal:0}
    ]});
  }
+ if(uri.pathname==='/api/public-matches'&&uri.searchParams.get('route')==='rivals'){
+  const opponent=uri.searchParams.get('opponent');
+  const map=uri.searchParams.get('map')||'';
+  const days=Number(uri.searchParams.get('days')||0);
+  const named=[
+   {name:'Rival Player',matchesSampled:2,kills:2,deaths:1,
+    damageDealt:145,damageTaken:85,damageDealtObserved:2,
+    damageTakenObserved:2,lastMatchAt:'2026-11-06T13:00:00Z'},
+   {name:'Second Rival',matchesSampled:1,kills:0,deaths:1,
+    damageDealt:null,damageTaken:44,damageDealtObserved:0,
+    damageTakenObserved:1,lastMatchAt:'2026-11-05T13:00:00Z'}
+  ];
+  return respond(res,200,{
+   schemaVersion:2,player:'Sample Member',platform:'xbox',
+   matchesScanned:4,matchesAnalysed:map?1:3,undatedMatches:0,
+   opponentNames:map?1:2,latestSavedAt:'2026-11-07T11:00:00Z',
+   filterDays:days,filterMap:map,filterMode:uri.searchParams.get('mode')||'',
+   selectedOpponent:opponent,
+   mapOptions:['Baltic_Main','Desert_Main'],modeOptions:['squad','solo'],
+   rivals:map?[named[0]]:named,encountersReturned:opponent?2:0,
+   encountersAvailable:opponent?2:0,
+   encounters:opponent?[
+    {map:'Baltic_Main',mode:'squad',playedAt:'2026-11-06T13:00:00Z',
+     kills:2,deaths:0,damageDealt:145,damageTaken:null},
+    {map:'Desert_Main',mode:'solo',playedAt:'2026-11-05T13:00:00Z',
+     kills:0,deaths:1,damageDealt:null,damageTaken:85}
+   ]:[],
+   note:'Only genuine analysed PUBG telemetry events; visible names unverified.'
+  });
+ }
  if(uri.pathname==='/api/public-matches')return respond(res,200,{
   schemaVersion:1,name:'Sample Member',platform:'xbox',
   source:'Private 180-day archive',archivedCount:4,availableCount:4,
@@ -474,6 +504,28 @@ async function run(){
 
    assert.equal(await page.locator('#telemetry-match').inputValue(),
     '00336e4b-d659-4497-bfc4-9f6dd705cc71');
+
+    await page.locator('#telemetry-rivals-refresh').click();
+    await page.waitForFunction(()=>document.getElementById('telemetry-rivals-count')
+     ?.textContent.includes('2 visible name'),{timeout:12000});
+    assert.equal(await page.locator('#telemetry-rivals-table tr').count(),2);
+    assert.match(await page.locator('#telemetry-rivals-note').innerText(),/3 distinct analysed matches/);
+    assert.match(await page.locator('#telemetry-rivals-table').innerText(),/n=2/);
+    await page.locator('#telemetry-rivals-search').fill('Rival Player');
+    assert.equal(await page.locator('#telemetry-rivals-table tr').count(),1);
+    await page.locator('#telemetry-rivals-search').fill('');
+    await page.locator('[data-rival-name="Rival Player"]').click();
+    await page.waitForFunction(()=>document.getElementById('telemetry-rival-detail')
+     ?.textContent.includes('Desert_Main'),{timeout:12000});
+    assert.match(await page.locator('#telemetry-rival-detail').innerText(),/unavailable, not zero/);
+    await page.locator('#telemetry-rivals-days').selectOption('7');
+    await page.waitForFunction(()=>document.getElementById('telemetry-rivals-note')
+     ?.textContent.includes('Last 7 days'),{timeout:12000});
+    await page.locator('#telemetry-rivals-map').selectOption('Desert_Main');
+    await page.waitForFunction(()=>document.getElementById('telemetry-rivals-count')
+     ?.textContent.includes('1 visible name'),{timeout:12000});
+    assert.equal(await page.locator('#telemetry-rivals-map').inputValue(),'Desert_Main');
+
    await page.locator('#match-map-filter').selectOption('');
    await page.locator('#match-outcome-filter').selectOption('unknown');
    assert.equal(await page.locator('#match-results article').count(),1);
