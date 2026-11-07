@@ -10,6 +10,7 @@ const extra = require('../lib/commands-extra');
 const { ensureGuildCommands } = require('../lib/register-commands');
 const squadAnalysis = require('../lib/squad-analysis');
 const channelDashboard = require('../lib/channel-dashboard');
+const clanRosterAdmin = require('../lib/clan-roster-admin');
 
 const CLAN_GUILD = '1411949587299569788';
 const createDb = () => createClient(process.env.SUPABASE_URL,
@@ -229,6 +230,7 @@ async function processCommand(body) {
   if (body.data?.name === 'leaderboard') return leaderboard(db);
   if (body.data?.name === 'setup') return channelDashboard.setup(db, body);
   if (body.data?.name === 'dashboard') return channelDashboard.command(db, body);
+  if (body.data?.name === 'clanmanage') return clanRosterAdmin.command(db, body);
   if (body.data?.name === 'help') return core.help();
   if (body.data?.name === 'roster') return core.roster(db, body);
   if (body.data?.name === 'clan') return core.clan(db);
@@ -298,7 +300,7 @@ module.exports = async (req, res) => {
   if (body.guild_id === CLAN_GUILD) {
     waitUntil(Promise.allSettled([work, ensureGuildCommands(createDb())]));
   } else waitUntil(work);
-  return res.status(200).json(isDashboardButton || (body.data?.name === 'dashboard' || body.data?.name === 'setup')
+  return res.status(200).json(isDashboardButton || (body.data?.name === 'dashboard' || body.data?.name === 'setup' || body.data?.name === 'clanmanage')
     ? { type: 5, data: { flags: 64 } }
     : { type: 5 });
 };
