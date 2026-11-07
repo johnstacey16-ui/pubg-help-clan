@@ -95,6 +95,37 @@ const server=http.createServer(async(req,res)=>{
  if(uri.pathname==='/api/public-stats')return respond(res,200,summary);
  if(uri.pathname==='/api/player-lookup')return respond(res,200,{
   schemaVersion:1,found:true,isClanMember:false,player:outsider});
+ if(uri.pathname==='/api/public-matches'&&uri.searchParams.get('route')==='lobby')
+  return respond(res,200,{
+   schemaVersion:1,kind:'match-lobby',matchId:'00336e4b-d659-4497-bfc4-9f6dd705cc71',
+   player:'Sample Member',platform:'xbox',
+   map:'Baltic_Main',mode:'squad',matchType:'official',
+   playedAt:'2026-11-05T14:00:00Z',savedAt:'2026-11-07T09:00:00Z',
+   durationSeconds:1811,playersShown:4,participantsInSource:4,
+   teamsShown:3,ownTeamPosition:2,note:'Actual saved PUBG match participant and roster data',
+   teams:[
+    {displayIndex:1,placement:1,isOwnTeam:false,assignedRoster:true,
+     kills:{value:8,observed:1},damage:{value:900,observed:1},
+     knocks:{value:4,observed:1},
+     players:[{name:'Opponent',placement:1,kills:8,damage:900,knocks:4,
+      assists:1,headshots:3,timeSurvivedSeconds:1800,deathType:'alive',isSelf:false}]},
+    {displayIndex:2,placement:2,isOwnTeam:true,assignedRoster:true,
+     kills:{value:10,observed:2},damage:{value:950,observed:2},
+     knocks:{value:5,observed:2},
+     players:[{name:'Sample Member',placement:2,kills:7,damage:800,
+       knocks:4,assists:2,headshots:2,timeSurvivedSeconds:1700,
+       deathType:'byzone',isSelf:true},
+      {name:'Friendly',placement:2,kills:3,damage:150,knocks:1,
+       assists:0,headshots:1,timeSurvivedSeconds:1500,
+       deathType:'byplayer',isSelf:false}]},
+    {displayIndex:3,placement:null,isOwnTeam:false,assignedRoster:false,
+     kills:{value:null,observed:0},damage:{value:null,observed:0},
+     knocks:{value:null,observed:0},
+     players:[{name:'Unassigned',placement:null,kills:null,damage:null,
+      knocks:null,assists:null,headshots:null,timeSurvivedSeconds:null,
+      deathType:null,isSelf:false}]}
+   ]
+  });
  if(uri.pathname==='/api/public-matches'&&uri.searchParams.get('route')==='clan-activity'){
   const span=Number(uri.searchParams.get('days')||30);
   const rows=Array.from({length:span},(_,i)=>{
@@ -592,6 +623,30 @@ async function run(){
    await page.locator('#clan-weapon-search').fill('Beryl');
    assert.equal(await page.locator('#clan-weapon-rows tr').count(),1);
    await page.locator('#clan-weapon-search').fill('');
+
+
+   await page.locator('[data-page="matches"]').click();
+   await page.locator('#page-matches').waitFor({state:'visible'});
+   await page.waitForFunction(()=>document.querySelector('[data-lobby-match]')!==null);
+   await page.locator('#match-results [data-lobby-match]').first().click();
+   assert.equal(await page.locator('#lobby-match').inputValue(),
+    '00336e4b-d659-4497-bfc4-9f6dd705cc71');
+   await page.locator('#lobby-load').click();
+   await page.waitForFunction(()=>document.getElementById('lobby-player-table')?.
+    textContent.includes('Opponent'));
+   assert.equal(await page.locator('#lobby-team-table tr').count(),3);
+   assert.equal(await page.locator('#lobby-player-table tr').count(),4);
+   assert.match(await page.locator('#lobby-player-table').innerText(),/Sample Member/);
+   assert.match(await page.locator('#lobby-team-table').innerText(),/YOUR SQUAD/);
+   assert.match(await page.locator('#lobby-count').innerText(),/4 participants/);
+   await page.locator('#lobby-team-scope').selectOption('mine');
+   assert.equal(await page.locator('#lobby-team-table tr').count(),1);
+   await page.locator('#lobby-search').fill('Friendly');
+   assert.equal(await page.locator('#lobby-player-table tr').count(),1);
+   assert.match(await page.locator('#lobby-player-table').innerText(),/Friendly/);
+   assert.equal(await page.locator('#lobby-export').isEnabled(),true);
+   await page.locator('#lobby-search').fill('');
+   await page.locator('#lobby-team-scope').selectOption('all');
 
    await page.locator('[data-page="health"]').click();
    await page.locator('#page-health').waitFor({state:'visible'});
