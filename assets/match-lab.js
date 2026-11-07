@@ -267,7 +267,8 @@
           (value(member.timeSurvivedSeconds)!==null?' · '+duration(member.timeSurvivedSeconds)+' survived':'')+
           '</span></div>').join(''):
           '<p class="small muted">No squad roster saved for this match.</p>')+
-        '</details><button type="button" class="secondary match-replay-select" data-replay-match="'+
+        '</details><button type="button" class="secondary match-replay-select" data-lobby-match="'+
+         escape(m.id)+'">View saved lobby</button> <button type="button" class="secondary match-replay-select" data-replay-match="'+
          escape(m.id)+'">Optional 2D replay (large telemetry)</button></article>';
     }).join('')||'<p class="match-empty">No matches match these filters. Change the selection to show more stored reports.</p>';
   }
