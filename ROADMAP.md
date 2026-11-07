@@ -83,7 +83,8 @@
 - [ ] Confirm trigger archiving on the next newly retrieved PUBG match in production
 - [x] Archived match details and squad breakdown on the website
 - [x] Recurring teammate analysis from real archived squads (games, wins, kills, damage and last played)
-- [ ] Opponent and rival analysis after safe source fields are available
+- [x] Verified, cache-only telemetry Rival Intelligence: observed opponent encounter counts, map/mode/date filters, searchable and sortable visible-name lists, per-metric damage coverage, and bounded match-by-match source-only drilldowns. Uses only already analysed telemetry and never assumes matching display names confirm account identity.
+- [ ] Verify multiple genuine production telemetry reports and the resulting opponent trend/drilldowns on actual records; missing stored analyses must remain an honest empty state.
 - [x] Weapon mastery views documenting StatsTotal, OfficialStatsTotal, CompetitiveStatsTotal, LevelCurrent, TierCurrent and XPTotal (separate categories)
 - [x] Real historical season/ranked snapshots and per-mode progression charts
 - [x] Historical season/ranked clan leaderboards from latest genuine per-player, per-mode, per-season observations with source timestamps (server-only SQL RPC, API, and website)
