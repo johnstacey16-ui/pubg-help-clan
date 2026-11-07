@@ -44,11 +44,26 @@ function browser(){
     calls.push(url);
     assert.match(url,/\/api\/public-matches\?/);
     assert.match(url,/route=rivals/);
-    return{ok:true,json:async()=>({
-     schemaVersion:1,matchesAnalysed:2,
+    const opponent=new URL(url,'https://example.test').searchParams.get('opponent');
+    return{ok:true,json:async()=>opponent?{
+     schemaVersion:2,matchesScanned:2,matchesAnalysed:2,
+     encountersReturned:2,encountersAvailable:2,
+     encounters:[
+      {map:'Baltic_Main',mode:'squad',playedAt:'2026-11-03T12:00:00Z',
+       kills:1,deaths:0,damageDealt:50,damageTaken:null},
+      {map:'Desert_Main',mode:'solo',playedAt:'2026-11-02T12:00:00Z',
+       kills:0,deaths:1,damageDealt:null,damageTaken:20}
+     ]
+    }:{
+     schemaVersion:2,matchesScanned:3,matchesAnalysed:2,undatedMatches:0,
+     opponentNames:2,mapOptions:['Baltic_Main','Desert_Main'],
+     modeOptions:['solo','squad'],filterDays:0,
      rivals:[{name:'Opponent',matchesSampled:2,kills:1,deaths:1,
-      damageDealt:50,damageTaken:20,lastMatchAt:'2026-11-03T12:00:00Z'}]
-    })};
+      damageDealt:50,damageTaken:20,damageDealtObserved:1,
+      damageTakenObserved:1,lastMatchAt:'2026-11-03T12:00:00Z'},
+     {name:'Another',matchesSampled:1,kills:0,deaths:1,
+      damageDealt:null,damageTaken:null,lastMatchAt:null}]
+    }};
    },
    console,URL:window.URL,Blob:class Blob{constructor(parts){this.parts=parts;}},
    URLSearchParams};
@@ -59,7 +74,9 @@ test('event explorer controls, replay player tracks and saved rivals exist',()=>
  for(const id of ['telemetry-event-type','telemetry-event-search',
   'telemetry-event-list','telemetry-event-next','telemetry-event-prev',
   'telemetry-event-count','telemetry-event-export','telemetry-rivals-refresh',
-  'telemetry-rivals-table']){
+  'telemetry-rivals-table','telemetry-rivals-count','telemetry-rivals-map',
+  'telemetry-rivals-mode','telemetry-rivals-days','telemetry-rival-detail',
+  'telemetry-rivals-search','telemetry-rivals-sort']){
   assert.ok(html.includes('id="'+id+'"'),id);
  }
 });
@@ -95,4 +112,31 @@ test('observed cross-match rival trends request only cached derived report route
  assert.match(b.get('telemetry-rivals-table').innerHTML,/Opponent/);
  assert.match(b.get('telemetry-rivals-table').innerHTML,/50/);
  assert.match(b.get('telemetry-rivals-note').textContent,/2 distinct/);
+});
+
+test('saved rival intelligence filters, missing damage and source-only detail report',async()=>{
+ const b=browser();
+ b.view.matchesChanged('Hero',[{id:b.report.matchId,map:'Erangel_Main'}]);
+ await b.get('telemetry-rivals-refresh').events.click();
+ assert.match(b.get('telemetry-rivals-count').textContent,/2 visible name/);
+ assert.match(b.get('telemetry-rivals-table').innerHTML,/n=1/);
+ b.get('telemetry-rivals-search').value='Opponent';
+ b.get('telemetry-rivals-search').events.input();
+ assert.doesNotMatch(b.get('telemetry-rivals-table').innerHTML,/Another/);
+ b.get('telemetry-rivals-search').value='';
+ b.get('telemetry-rivals-search').events.input();
+ b.get('telemetry-rivals-days').value='7';
+ await b.get('telemetry-rivals-days').events.change();
+ assert.match(b.calls[1],/days=7/);
+ b.get('telemetry-rivals-map').value='Baltic_Main';
+ await b.get('telemetry-rivals-map').events.change();
+ assert.match(b.calls[2],/map=Baltic_Main/);
+ b.get('telemetry-rivals-table').events.click({
+  target:{closest(){return{dataset:{rivalName:'Opponent'}};}}
+ });
+ await new Promise(setImmediate);
+ assert.match(b.calls.at(-1),/opponent=Opponent/);
+ assert.match(b.get('telemetry-rival-detail').innerHTML,/Baltic_Main/);
+ assert.match(b.get('telemetry-rival-detail').innerHTML,/Desert_Main/);
+ assert.match(b.get('telemetry-rival-detail').innerHTML,/unavailable, not zero/);
 });
