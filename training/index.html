@@ -523,29 +523,53 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
     </div>
   </div>
   <div class="clan-tool-subnav-label">CLAN DATA &amp; API TOOLS <span>SELECT A SECTION</span></div>
+      <label class="clan-page-picker" for="clan-page-select"><span>Dashboard section</span><select id="clan-page-select" aria-label="Jump to dashboard section">
+        <optgroup label="Home"><option value="overview">◫ Overview</option></optgroup>
+        <optgroup label="Players & teams"><option value="players">♙ Player roster</option><option value="full-stats">▦ Complete player stats</option><option value="modes">▥ Game modes</option><option value="weapons">⌖ Weapon mastery</option><option value="survival">♧ Survival mastery</option><option value="teammates">♟ Teammate insights</option><option value="compare">⚔ Compare players</option></optgroup>
+        <optgroup label="Match analysis"><option value="matches">⚑ Match intelligence</option></optgroup>
+        <optgroup label="Rankings & awards"><option value="leaderboard">🏆 Leaderboards</option><option value="season">🏆 Season & ranked</option><option value="awards">🥇 Clan awards</option><option value="global">◎ Official regional ranks</option></optgroup>
+        <optgroup label="Data & insights"><option value="analysis">◈ Deep analysis</option><option value="sources">▤ PUBG data library</option><option value="data-tools">⇩ Data tools</option></optgroup>
+        <optgroup label="Help & status"><option value="help">? Analytics guide</option><option value="health">◉ Data health</option><option value="roadmap">◎ Roadmap</option></optgroup>
+      </select></label>
   <nav id="clan-section-tabs" class="clan-section-tabs" aria-label="Clan Dashboard sections">
-
-      <button class="nav-link active" type="button" data-page="overview"><span>◫</span> Overview</button>
-      <button class="nav-link" type="button" data-page="leaderboard"><span>🏆</span> Leaderboards</button>
-      <button class="nav-link" type="button" data-page="players"><span>♙</span> Player roster</button>
-      <button class="nav-link" type="button" data-page="modes"><span>▥</span> Game modes</button>
-      <button class="nav-link" type="button" data-page="full-stats"><span>▦</span> Complete player stats</button>
-      <button class="nav-link" type="button" data-page="matches"><span>⚑</span> Match intelligence</button>
-      <button class="nav-link" type="button" data-page="weapons"><span>⌖</span> Weapon mastery</button>
-      <button class="nav-link" type="button" data-page="season"><span>🏆</span> Season & ranked</button>
-      <button class="nav-link" type="button" data-page="teammates"><span>♟</span> Teammate insights</button>
-      <button class="nav-link" type="button" data-page="compare"><span>⚔</span> Compare players</button>
-      <button class="nav-link" type="button" data-page="awards"><span>🥇</span> Clan awards</button>
-      <button class="nav-link" type="button" data-page="analysis"><span>◈</span> Deep analysis</button>
-      <button class="nav-link" type="button" data-page="data-tools"><span>⇩</span> Data tools</button>
-      <button class="nav-link" type="button" data-page="help"><span>?</span> Analytics guide</button>
-      <button class="nav-link" type="button" data-page="survival"><span>♧</span> Survival mastery</button>
-      <button class="nav-link" type="button" data-page="sources"><span>▤</span> PUBG data library</button>
-      <button class="nav-link" type="button" data-page="global"><span>◎</span> Official regional ranks</button>
-      <button class="nav-link" type="button" data-page="health"><span>◉</span> Data health</button>
-      <button class="nav-link" type="button" data-page="roadmap"><span>◎</span> Roadmap</button>
-    
-  </nav>
+      <div class="clan-nav-group" role="group" aria-label="Home">
+        <span class="clan-nav-group-label">Home</span>
+        <button class="nav-link active" type="button" data-page="overview"><span>◫</span> Overview</button>
+      </div>
+      <div class="clan-nav-group" role="group" aria-label="Players & teams">
+        <span class="clan-nav-group-label">Players & teams</span>
+        <button class="nav-link" type="button" data-page="players"><span>♙</span> Player roster</button>
+        <button class="nav-link" type="button" data-page="full-stats"><span>▦</span> Complete player stats</button>
+        <button class="nav-link" type="button" data-page="modes"><span>▥</span> Game modes</button>
+        <button class="nav-link" type="button" data-page="weapons"><span>⌖</span> Weapon mastery</button>
+        <button class="nav-link" type="button" data-page="survival"><span>♧</span> Survival mastery</button>
+        <button class="nav-link" type="button" data-page="teammates"><span>♟</span> Teammate insights</button>
+        <button class="nav-link" type="button" data-page="compare"><span>⚔</span> Compare players</button>
+      </div>
+      <div class="clan-nav-group" role="group" aria-label="Match analysis">
+        <span class="clan-nav-group-label">Match analysis</span>
+        <button class="nav-link" type="button" data-page="matches"><span>⚑</span> Match intelligence</button>
+      </div>
+      <div class="clan-nav-group" role="group" aria-label="Rankings & awards">
+        <span class="clan-nav-group-label">Rankings & awards</span>
+        <button class="nav-link" type="button" data-page="leaderboard"><span>🏆</span> Leaderboards</button>
+        <button class="nav-link" type="button" data-page="season"><span>🏆</span> Season & ranked</button>
+        <button class="nav-link" type="button" data-page="awards"><span>🥇</span> Clan awards</button>
+        <button class="nav-link" type="button" data-page="global"><span>◎</span> Official regional ranks</button>
+      </div>
+      <div class="clan-nav-group" role="group" aria-label="Data & insights">
+        <span class="clan-nav-group-label">Data & insights</span>
+        <button class="nav-link" type="button" data-page="analysis"><span>◈</span> Deep analysis</button>
+        <button class="nav-link" type="button" data-page="sources"><span>▤</span> PUBG data library</button>
+        <button class="nav-link" type="button" data-page="data-tools"><span>⇩</span> Data tools</button>
+      </div>
+      <div class="clan-nav-group" role="group" aria-label="Help & status">
+        <span class="clan-nav-group-label">Help & status</span>
+        <button class="nav-link" type="button" data-page="help"><span>?</span> Analytics guide</button>
+        <button class="nav-link" type="button" data-page="health"><span>◉</span> Data health</button>
+        <button class="nav-link" type="button" data-page="roadmap"><span>◎</span> Roadmap</button>
+      </div>
+    </nav>
   <div id="content" class="clan-dashboard-content">
 
     <p id="notice" role="status" aria-live="polite" class="notice">Loading saved PUBG statistics…</p>
@@ -574,6 +598,15 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
         <article class="card metric"><div class="metric-title">PLAYER MATCHES <span class="sky">▥</span></div><strong id="matches">—</strong><small>Summed player records</small></article>
         <article class="card metric"><div class="metric-title">ROSTER VERIFIED <span class="gold">♙</span></div><strong id="verified">—</strong><small id="verified-caption">Official clan members</small></article>
       </div>
+      <section class="overview-shortcuts" aria-labelledby="overview-shortcuts-title">
+        <div class="section-heading"><div><p class="eyebrow subtle">QUICK ACCESS</p><h2 id="overview-shortcuts-title">Explore your clan</h2></div></div>
+        <div class="overview-shortcut-grid">
+          <button type="button" class="overview-shortcut" data-match-jump="match-performance-panel"><span class="shortcut-icon" aria-hidden="true">↗</span><strong>Recent Form</strong><small>Last 10 vs previous 10 saved games</small><span class="shortcut-action">View player form →</span></button>
+          <button type="button" class="overview-shortcut" data-match-jump="personal-rivals-panel"><span class="shortcut-icon" aria-hidden="true">⚔</span><strong>Kill rivalries</strong><small>Most killed and most killed by</small><span class="shortcut-action">Explore opponents →</span></button>
+          <button type="button" class="overview-shortcut" data-match-jump="clan-board-panel"><span class="shortcut-icon" aria-hidden="true">▥</span><strong>Clan match history</strong><small>Saved games and comparisons</small><span class="shortcut-action">Explore results →</span></button>
+          <button type="button" class="overview-shortcut" data-go="leaderboard"><span class="shortcut-icon" aria-hidden="true">★</span><strong>Leaderboards</strong><small>Verified lifetime standings</small><span class="shortcut-action">View rankings →</span></button>
+        </div>
+      </section>
       <div class="two-columns">
         <article class="card panel"><div class="panel-heading"><div><p class="eyebrow subtle">PERFORMANCE SPLIT</p><h3>Kills by game mode</h3></div><button type="button" class="text-button" data-go="modes">Full breakdown ↗</button></div><div id="overview-chart" class="bars" aria-label="Kills by game mode"></div><p class="small muted">Real lifetime totals from saved PUBG game mode data.</p></article>
         <article class="card panel"><div class="panel-heading"><div><p class="eyebrow subtle">CLAN ELITE</p><h3>Top performers</h3></div><button type="button" class="text-button" data-go="leaderboard">See all ↗</button></div><div id="top-five"></div></article>
@@ -621,101 +654,16 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
     </section>
     <section class="page" id="page-matches" hidden>
       <div class="page-head"><p class="eyebrow">CACHED MATCH ANALYSIS</p><h1>Match <em>intelligence.</em></h1><p>Explore map, mode, placement and squad performance from archived matches saved for up to 180 days. Compare real observed reports and recorded PUBG combat events, including match-local opponent encounters.</p></div>
-      <section class="card panel clan-pulse-panel" aria-labelledby="clan-pulse-heading">
-        <div class="panel-heading"><div>
-          <p class="eyebrow subtle">REAL PUBG CLAN ACTIVITY · ARCHIVED MATCHES</p>
-          <h2 id="clan-pulse-heading">Clan Activity Pulse</h2>
-        </div><span class="chip">ZERO PUBG REQUESTS</span></div>
-        <p class="small muted">Explore actual saved clan match activity by UTC date. Unique games are deduplicated across clan teammates; player-match observations record each clan member in a shared match. Today's figures are incomplete, and a date without saved matches does not prove nobody played.</p>
-        <div class="filters">
-          <label>UTC history window <select id="clan-pulse-days">
-            <option value="7">7 UTC calendar days</option>
-            <option value="30" selected>30 UTC calendar days</option>
-            <option value="180">180 UTC calendar days</option>
-          </select></label>
-          <label>Chart statistic <select id="clan-pulse-metric">
-            <option value="distinctMatches" selected>Distinct saved games</option>
-            <option value="playerMatches">Player-match observations</option>
-            <option value="kills">Observed player kills</option>
-            <option value="playerWins">Observed player wins</option>
-          </select></label>
-          <button class="secondary" id="clan-pulse-reload" type="button">↻ Reload saved activity</button>
-        </div>
-        <p class="small muted" id="clan-pulse-status" aria-live="polite">Open Match Intelligence to load actual clan activity.</p>
-        <div id="clan-pulse-kpis" class="clan-pulse-kpis" aria-label="Observed clan activity totals"></div>
-        <p id="clan-pulse-coverage" class="small muted" aria-live="polite"></p>
-        <div class="clan-pulse-visual" aria-label="Selectable saved clan activity chart">
-          <div id="clan-pulse-chart" class="clan-pulse-chart"></div>
-        </div>
-        <div id="clan-pulse-detail" class="clan-pulse-detail" aria-live="polite">
-          Select a saved activity day to inspect its genuine observation totals.
-        </div>
-        <p class="small muted" id="clan-pulse-table-note"></p>
-        <div class="scroll-table"><table><thead><tr>
-          <th>UTC DATE</th><th>DISTINCT GAMES</th><th>PLAYER-MATCHES</th>
-          <th>ACTIVE PLAYERS</th><th>PLAYER WINS</th><th>KILLS</th><th>KILLS OBSERVED</th>
-        </tr></thead><tbody id="clan-pulse-table"></tbody></table></div>
-        <p class="small muted">7- and 30-day charts show individual UTC days. The 180-day chart groups consecutive calendar days in weeks to stay lightweight; selecting a group reveals its daily records. Weekly active-player totals are explicitly <em>player-days</em>, never fabricated unique players.</p>
-      </section>
-      <section class="card panel clan-board-panel" aria-labelledby="clan-board-heading">
-        <div class="panel-heading">
-          <div><p class="eyebrow subtle">SAVED CLAN MATCH HISTORY · OFFICIAL RECORDS</p>
-            <h2 id="clan-board-heading">Clan historical match leaderboard</h2></div>
-          <span class="chip">NO PUBG REQUESTS</span>
-        </div>
-        <p class="small muted">Compare verified clan players across genuinely archived matches. Switch rolling windows, maps and modes. The board uses saved player-match records only; shared squad games may be counted once per clan member, and missing or unarchived matches cannot be inferred.</p>
-        <div class="filters">
-          <label>Recorded history <select id="clan-board-days">
-            <option value="7">Past 7 days</option><option value="30" selected>Past 30 days</option>
-            <option value="180">Past 180 days</option>
-          </select></label>
-          <label>Map <select id="clan-board-map"><option value="">All maps</option></select></label>
-          <label>Mode <select id="clan-board-mode"><option value="">All modes</option></select></label>
-          <label>Minimum games <select id="clan-board-min">
-            <option value="1">1 game</option><option value="3" selected>3 games</option>
-            <option value="5">5 games</option><option value="10">10 games</option>
-          </select></label>
-          <label>Rank by <select id="clan-board-sort">
-            <option value="killsPerGame" selected>Kills per observed game</option>
-            <option value="damagePerGame">Damage per observed game</option>
-            <option value="winRate">Win rate</option>
-            <option value="top10Rate">Top-10 rate</option>
-            <option value="averageSurvival">Average survival</option>
-            <option value="wins">Recorded wins</option>
-            <option value="games">Saved games</option>
-            <option value="latest">Latest saved match</option>
-          </select></label>
-          <label>Search clan player <input id="clan-board-search" type="search" placeholder="Gamertag…" autocomplete="off" maxlength="100"></label>
-          <button class="secondary" type="button" id="clan-board-refresh">↻ Reload saved board</button>
-          <button class="secondary" type="button" id="clan-board-export" disabled>↓ Export filtered CSV</button>
-        </div>
-        <p class="small muted" id="clan-board-status" aria-live="polite">Open Match Intelligence to load saved clan history.</p>
-        <div class="clan-board-kpis" id="clan-board-kpis" aria-label="Saved clan history coverage"></div>
-        <p class="small muted" id="clan-board-note" aria-live="polite">Rates and rankings include only observed PUBG match records, not career totals.</p>
-        <div class="scroll-table"><table><thead><tr>
-          <th>#</th><th>CLAN PLAYER</th><th>GAMES SAVED</th><th>PLACEMENTS</th>
-          <th>WINS</th><th>WIN %</th><th>TOP-10 %</th><th>KILLS/GAME</th>
-          <th>AVG DAMAGE</th><th>AVG SURVIVAL</th>
-        </tr></thead><tbody id="clan-board-table"></tbody></table></div>
-        <div class="clan-board-grid">
-          <section aria-labelledby="clan-board-maps-heading">
-            <h3 id="clan-board-maps-heading">Observed activity by map</h3>
-            <p class="small muted">Player-match observations, not unique matches. Uses the chosen period and mode.</p>
-            <div id="clan-board-map-bars"></div>
-          </section>
-          <section id="clan-board-compare-panel" aria-labelledby="clan-board-compare-heading">
-            <h3 id="clan-board-compare-heading">Compare two clan players</h3>
-            <p class="small muted">Identical map, mode and time window; no invented games or skill adjustment.</p>
-            <div class="filters">
-              <label>Player one <select id="clan-board-compare-a"></select></label>
-              <label>Player two <select id="clan-board-compare-b"></select></label>
-            </div>
-            <div id="clan-board-compare" aria-live="polite">Choose saved players to compare.</div>
-          </section>
-        </div>
-      </section>
-
-      <div class="card panel">
+            <nav class="match-jump-nav" aria-label="Match intelligence quick navigation">
+        <span class="match-jump-intro">Explore matches</span>
+        <button type="button" data-match-jump="match-performance-panel">Player form</button>
+        <button type="button" data-match-jump="personal-rivals-panel">Kill rivalries</button>
+        <button type="button" data-match-jump="clan-pulse-panel">Clan activity</button>
+        <button type="button" data-match-jump="clan-board-panel">Clan leaderboard</button>
+        <button type="button" data-match-jump="lobby-panel">Saved lobbies</button>
+        <button type="button" data-match-jump="scout-panel">Opponent scouting</button>
+      </nav>
+      <div class="card panel match-performance-panel" id="match-performance-panel">
         <div class="filters">
           <label>Saved console player <select id="match-player"></select></label>
           <button type="button" class="secondary" id="match-reload">↻ Reload saved matches</button>
@@ -829,6 +777,100 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
         <div id="personal-rivals-detail" class="personal-rivals-detail" aria-live="polite"></div>
         <p class="small muted personal-rivals-explainer">Only matches whose combat events have already been analysed count here. A missing match is not a zero-kill match. Player names from older saved reports are grouped by displayed name, which cannot guarantee one account across matches. Team kills, suicides and environmental deaths do not count as player rivalries.</p>
         <button class="secondary" type="button" id="personal-rivals-analyse">Analyse another saved match</button>
+      </section>
+
+<section class="card panel clan-pulse-panel" id="clan-pulse-panel" aria-labelledby="clan-pulse-heading">
+        <div class="panel-heading"><div>
+          <p class="eyebrow subtle">REAL PUBG CLAN ACTIVITY · ARCHIVED MATCHES</p>
+          <h2 id="clan-pulse-heading">Clan Activity Pulse</h2>
+        </div><span class="chip">ZERO PUBG REQUESTS</span></div>
+        <p class="small muted">Explore actual saved clan match activity by UTC date. Unique games are deduplicated across clan teammates; player-match observations record each clan member in a shared match. Today's figures are incomplete, and a date without saved matches does not prove nobody played.</p>
+        <div class="filters">
+          <label>UTC history window <select id="clan-pulse-days">
+            <option value="7">7 UTC calendar days</option>
+            <option value="30" selected>30 UTC calendar days</option>
+            <option value="180">180 UTC calendar days</option>
+          </select></label>
+          <label>Chart statistic <select id="clan-pulse-metric">
+            <option value="distinctMatches" selected>Distinct saved games</option>
+            <option value="playerMatches">Player-match observations</option>
+            <option value="kills">Observed player kills</option>
+            <option value="playerWins">Observed player wins</option>
+          </select></label>
+          <button class="secondary" id="clan-pulse-reload" type="button">↻ Reload saved activity</button>
+        </div>
+        <p class="small muted" id="clan-pulse-status" aria-live="polite">Open Match Intelligence to load actual clan activity.</p>
+        <div id="clan-pulse-kpis" class="clan-pulse-kpis" aria-label="Observed clan activity totals"></div>
+        <p id="clan-pulse-coverage" class="small muted" aria-live="polite"></p>
+        <div class="clan-pulse-visual" aria-label="Selectable saved clan activity chart">
+          <div id="clan-pulse-chart" class="clan-pulse-chart"></div>
+        </div>
+        <div id="clan-pulse-detail" class="clan-pulse-detail" aria-live="polite">
+          Select a saved activity day to inspect its genuine observation totals.
+        </div>
+        <p class="small muted" id="clan-pulse-table-note"></p>
+        <div class="scroll-table"><table><thead><tr>
+          <th>UTC DATE</th><th>DISTINCT GAMES</th><th>PLAYER-MATCHES</th>
+          <th>ACTIVE PLAYERS</th><th>PLAYER WINS</th><th>KILLS</th><th>KILLS OBSERVED</th>
+        </tr></thead><tbody id="clan-pulse-table"></tbody></table></div>
+        <p class="small muted">7- and 30-day charts show individual UTC days. The 180-day chart groups consecutive calendar days in weeks to stay lightweight; selecting a group reveals its daily records. Weekly active-player totals are explicitly <em>player-days</em>, never fabricated unique players.</p>
+      </section>
+      <section class="card panel clan-board-panel" id="clan-board-panel" aria-labelledby="clan-board-heading">
+        <div class="panel-heading">
+          <div><p class="eyebrow subtle">SAVED CLAN MATCH HISTORY · OFFICIAL RECORDS</p>
+            <h2 id="clan-board-heading">Clan historical match leaderboard</h2></div>
+          <span class="chip">NO PUBG REQUESTS</span>
+        </div>
+        <p class="small muted">Compare verified clan players across genuinely archived matches. Switch rolling windows, maps and modes. The board uses saved player-match records only; shared squad games may be counted once per clan member, and missing or unarchived matches cannot be inferred.</p>
+        <div class="filters">
+          <label>Recorded history <select id="clan-board-days">
+            <option value="7">Past 7 days</option><option value="30" selected>Past 30 days</option>
+            <option value="180">Past 180 days</option>
+          </select></label>
+          <label>Map <select id="clan-board-map"><option value="">All maps</option></select></label>
+          <label>Mode <select id="clan-board-mode"><option value="">All modes</option></select></label>
+          <label>Minimum games <select id="clan-board-min">
+            <option value="1">1 game</option><option value="3" selected>3 games</option>
+            <option value="5">5 games</option><option value="10">10 games</option>
+          </select></label>
+          <label>Rank by <select id="clan-board-sort">
+            <option value="killsPerGame" selected>Kills per observed game</option>
+            <option value="damagePerGame">Damage per observed game</option>
+            <option value="winRate">Win rate</option>
+            <option value="top10Rate">Top-10 rate</option>
+            <option value="averageSurvival">Average survival</option>
+            <option value="wins">Recorded wins</option>
+            <option value="games">Saved games</option>
+            <option value="latest">Latest saved match</option>
+          </select></label>
+          <label>Search clan player <input id="clan-board-search" type="search" placeholder="Gamertag…" autocomplete="off" maxlength="100"></label>
+          <button class="secondary" type="button" id="clan-board-refresh">↻ Reload saved board</button>
+          <button class="secondary" type="button" id="clan-board-export" disabled>↓ Export filtered CSV</button>
+        </div>
+        <p class="small muted" id="clan-board-status" aria-live="polite">Open Match Intelligence to load saved clan history.</p>
+        <div class="clan-board-kpis" id="clan-board-kpis" aria-label="Saved clan history coverage"></div>
+        <p class="small muted" id="clan-board-note" aria-live="polite">Rates and rankings include only observed PUBG match records, not career totals.</p>
+        <div class="scroll-table"><table><thead><tr>
+          <th>#</th><th>CLAN PLAYER</th><th>GAMES SAVED</th><th>PLACEMENTS</th>
+          <th>WINS</th><th>WIN %</th><th>TOP-10 %</th><th>KILLS/GAME</th>
+          <th>AVG DAMAGE</th><th>AVG SURVIVAL</th>
+        </tr></thead><tbody id="clan-board-table"></tbody></table></div>
+        <div class="clan-board-grid">
+          <section aria-labelledby="clan-board-maps-heading">
+            <h3 id="clan-board-maps-heading">Observed activity by map</h3>
+            <p class="small muted">Player-match observations, not unique matches. Uses the chosen period and mode.</p>
+            <div id="clan-board-map-bars"></div>
+          </section>
+          <section id="clan-board-compare-panel" aria-labelledby="clan-board-compare-heading">
+            <h3 id="clan-board-compare-heading">Compare two clan players</h3>
+            <p class="small muted">Identical map, mode and time window; no invented games or skill adjustment.</p>
+            <div class="filters">
+              <label>Player one <select id="clan-board-compare-a"></select></label>
+              <label>Player two <select id="clan-board-compare-b"></select></label>
+            </div>
+            <div id="clan-board-compare" aria-live="polite">Choose saved players to compare.</div>
+          </section>
+        </div>
       </section>
 
       <section class="card panel lobby-panel" id="lobby-panel" aria-labelledby="lobby-title">
