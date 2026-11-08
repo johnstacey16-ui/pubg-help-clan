@@ -532,6 +532,10 @@ async function run(){
    assert.equal(await page.locator('#clan-board-table tr').count(),3);
    assert.equal(await page.locator('#clan-board-export').isDisabled(),false);
 
+   assert.equal(await page.locator('#recent-form-rows tr').count(),5);
+   assert.match(await page.locator('#recent-form-status').innerText(),/Not enough history/);
+   assert.match(await page.locator('#recent-form-status').innerText(),/4 \/ 10 latest games/);
+   assert.match(await page.locator('#recent-form-status').innerText(),/0 \/ 10 previous games/);
    assert.equal(await page.locator('#match-results article').count(),4);
    assert.match(await page.locator('#match-lab-coverage').innerText(),/4 of 4/);
    assert.match(await page.locator('#match-lab-coverage').innerText(),/NOT lifetime totals/);
@@ -720,6 +724,28 @@ async function run(){
    await page.locator('#health-refresh').click();
    await page.waitForFunction(()=>document.getElementById('health-backfill-note')?.
     textContent.includes('2 clan tasks are pending'),{timeout:12000});
+   // Verify complete 10-vs-10 form in real Chrome at desktop and mobile widths.
+   // The fixture is synthetic and stored only in this browser test.
+   await page.locator('[data-page="matches"]').click();
+   await page.locator('#page-matches').waitFor({state:'visible'});
+   await page.evaluate(()=>{
+    const games=Array.from({length:20},(_,i)=>({
+     id:'synthetic-form-'+i,
+     playedAt:new Date(Date.UTC(2026,10,30-i)).toISOString(),
+     map:i%2?'Baltic_Main':'Desert_Main',mode:'squad',
+     kills:i<10?4:1,damage:i<10?450:150,
+     placement:i<10?(i<4?1:5):18
+    }));
+    window.MatchLab.render({name:'Sample Member',platform:'xbox',
+     archivedCount:20,matches:games.reverse()});
+   });
+   assert.equal(await page.locator('#recent-form-rows tr').count(),5);
+   assert.match(await page.locator('#recent-form-status').innerText(),/Improving/);
+   assert.match(await page.locator('#recent-form-status').innerText(),/10 \/ 10 latest games/);
+   assert.match(await page.locator('#recent-form-rows').innerText(),/Better/);
+   await page.locator('#match-map-filter').selectOption('Baltic_Main');
+   assert.match(await page.locator('#recent-form-status').innerText(),/Improving/,
+    'map filter must not alter the fixed 20-game form window');
    assert.deepEqual(errors,[],'Browser console errors at '+width+'px');
    console.log('FULL STATS CHROME PASS: '+width+'px; lifetime and source-correct mastery explorer');
    await page.close();
