@@ -3,6 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { importPendingBatch } = require('../lib/import-batch');
 const { collectClanSeasons } = require('../lib/clan-season-sync');
 const { collectClanExtras } = require('../lib/clan-backfill');
+const { collectClanRivalries } = require('../lib/clan-rivalry-collector');
 const channelDashboard = require('../lib/channel-dashboard');
 const {verifyGitHubBackfillToken}=require('../lib/github-oidc');
 
@@ -50,6 +51,11 @@ module.exports = async (req, res) => {
     try{result.seasonCollection=await collectClanSeasons(db);}
     catch(error){console.error('Clan season backfill failed:',error.message);
       result.seasonCollection={status:'failed'};}
+    // Existing twice-daily OIDC workflow also collects up to two official
+    // cached-match telemetry samples for ALL verified clan members in a game.
+    try{result.rivalryCollection=await collectClanRivalries(db);}
+    catch(error){console.error('Automatic clan rivalries unavailable:',error.message);
+      result.rivalryCollection={status:'failed',claimed:0};}
     return res.status(200).json({mode:'backfill',...result});
   }
 
@@ -74,6 +80,10 @@ module.exports = async (req, res) => {
   try{result.extras=await collectClanExtras(db);}
   catch(error){console.error('Scheduled extra PUBG backfill failed:',error.message);
     result.extras={status:'failed'};}
+  // No new cron: the protected daily fallback progresses kill-only matches.
+  try{result.rivalryCollection=await collectClanRivalries(db);}
+  catch(error){console.error('Automatic clan rivalries unavailable:',error.message);
+    result.rivalryCollection={status:'failed',claimed:0};}
   // Pruning occurs on the existing secret-protected daily sync.
   try {
     const pruned=await db.rpc('prune_clan_match_archive');
