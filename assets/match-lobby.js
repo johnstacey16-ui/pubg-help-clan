@@ -7,6 +7,11 @@
  if(root&&root.document)root.MatchLobby=api;
 })(typeof window!=='undefined'?window:globalThis,function(){
  const $=id=>document.getElementById(id);
+ // Display-only translation. Keep source map IDs unchanged for API filtering.
+ const displayMap=value=>{
+   const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+   return dictionary?.mapName?dictionary.mapName(value):value;
+ };
  const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({
   '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  })[c]);
@@ -45,7 +50,7 @@
   if(!$('lobby-match'))return;
   const select=$('lobby-match'),old=select.value;
   select.innerHTML=matches.map(m=>
-   '<option value="'+escape(m.id)+'">'+escape(m.map||'Unknown map')+
+   '<option value="'+escape(m.id)+'">'+escape(displayMap(m.map||'Unknown map'))+
    ' · '+escape(m.mode||'Unknown mode')+' · '+escape(date(m.playedAt))+
    '</option>').join('');
   select.value=matches.some(m=>m.id===old)?old:matches[0]?.id||'';
@@ -146,7 +151,7 @@
    if(call!==request||selectedName!==name)return;
    report=result;
    $('lobby-export').disabled=false;
-   $('lobby-status').textContent=result.map+' · '+result.mode+' · '+
+   $('lobby-status').textContent=displayMap(result.map)+' · '+result.mode+' · '+
     date(result.playedAt)+' · '+(result.archived?'retained lobby archive':'saved match cache')+
     ' · source saved '+date(result.savedAt)+
     '. '+result.note;

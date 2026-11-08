@@ -7,6 +7,10 @@
   if(root&&root.document)root.SquadChemistry=api;
 })(typeof window!=='undefined'?window:globalThis,function(){
   const $=id=>document.getElementById(id);
+  const displayMap=value=>{
+    const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+    return dictionary?.mapName?dictionary.mapName(value):value;
+  };
   const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
@@ -100,7 +104,7 @@
     if(!p){out.innerHTML='<p class="small muted">Choose a saved partner to inspect map and mode coverage.</p>';return;}
     const rows=(key)=>Array.isArray(p[key])?p[key]:[];
     const groups=label=>rows(label).map(x=>
-      '<div class="squad-chem-row"><span>'+escape(x.name)+'</span><strong>'+
+      '<div class="squad-chem-row"><span>'+escape(label==='maps'?displayMap(x.name):x.name)+'</span><strong>'+
       number(x.games)+' matches</strong></div>').join('')||'<p class="small muted">Not recorded.</p>';
     out.innerHTML='<div class="squad-chem-statrow">'+
       '<div><small>Wins / known finishes</small><strong>'+number(p.wins)+' / '+

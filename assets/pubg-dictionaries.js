@@ -19,5 +19,15 @@ const dictionaries=freezeDictionary({
 "medal":freezeDictionary({label:"Mastery medals",path:"dictionaries/weaponMastery/medalName.json",values:freezeDictionary({"MedalAnnihilation": {"description": "Defeat an entire squad by yourself.", "name": "Annihilation"}, "MedalAssassin": {"description": "Defeat an enemy with a headshot without taking damage.", "name": "Assassin"}, "MedalDeadeye": {"description": "Defeat an enemy with a headshot.", "name": "Deadeye"}, "MedalDoubleKill": {"description": "Defeat 2 enemies in rapid succession.", "name": "Double Kill"}, "MedalFirstBlood": {"description": "Defeat the first opponent in a match.", "name": "First Blood"}, "MedalFrenzy": {"description": "Defeat 5 opponents with a single weapon in a match.", "name": "Frenzy"}, "MedalLastManStanding": {"description": "Defeat the last opponent in a match.", "name": "Last Man Standing"}, "MedalLongshot": {"description": "Defeat an enemy from at least 200 meters.", "name": "Longshot"}, "MedalPunisher": {"description": "Deal 300 damage with a single weapon in a match.", "name": "Punisher"}, "MedalQuadKill": {"description": "Defeat 4 enemies in rapid succession.", "name": "Quad Kill"}, "MedalRampage": {"description": "Defeat 10 opponents with a single weapon in a match.", "name": "Rampage"}, "MedalTripleKill": {"description": "Defeat 3 enemies in rapid succession.", "name": "Triple Kill"}})}),
 });
 
-return{dictionaryRevision,dictionaries};
+// Canonical, friendly display name for publisher map identifiers.
+ // Leave unknown map IDs intact instead of guessing a different battleground.
+function mapName(value){
+  if(typeof value!=='string'||!value.trim())return 'Unknown map';
+  const code=value.trim();
+  const name=Object.hasOwn(dictionaries.map.values,code)?
+    dictionaries.map.values[code]:code;
+  // The remastered version is simply called Erangel in the game UI.
+  return name==='Erangel (Remastered)'?'Erangel':name;
+}
+return{dictionaryRevision,dictionaries,mapName};
 });

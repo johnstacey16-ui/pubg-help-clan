@@ -10,6 +10,11 @@
  }
 })(typeof window!=='undefined'?window:globalThis,function(){
  const $=id=>document.getElementById(id);
+ // Display-only translation. Keep source map IDs unchanged for API filtering.
+ const displayMap=value=>{
+   const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+   return dictionary?.mapName?dictionary.mapName(value):value;
+ };
  const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({
   '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  })[c]);
@@ -143,7 +148,7 @@
     '<div class="scroll-table"><table><thead><tr><th>DATE</th><th>MAP</th>'+
     '<th>MODE</th><th>YOU KILLED THEM</th><th>THEY KILLED YOU</th></tr></thead><tbody>'+
     (fights.map(m=>'<tr><td>'+escape(date(m.playedAt))+'</td><td>'+
-     escape(m.map)+'</td><td>'+escape(m.mode)+'</td><td>'+
+     escape(displayMap(m.map))+'</td><td>'+escape(m.mode)+'</td><td>'+
      fmt(m.kills)+'</td><td>'+fmt(m.deaths)+'</td></tr>').join('')||
      '<tr><td colspan="5">No confirmed kills are present in the returned matches.</td></tr>')+
     '</tbody></table></div>';

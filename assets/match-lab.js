@@ -7,6 +7,11 @@
   if(root&&root.document)root.MatchLab=api;
 })(typeof window!=='undefined'?window:globalThis,function(){
   const $=id=>document.getElementById(id);
+  // Display-only translation. Keep source map IDs unchanged for API filtering.
+  const displayMap=value=>{
+    const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+    return dictionary?.mapName?dictionary.mapName(value):value;
+  };
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
@@ -142,7 +147,7 @@
        value:value(m[metric]),placement:value(m.placement)}));
   }
   function renderGroup(id,arr){
-    $(id).innerHTML=arr.map(g=>'<tr><td><strong>'+escape(g.name)+'</strong></td>'+
+    $(id).innerHTML=arr.map(g=>'<tr><td><strong>'+escape(id==='match-map-table'?displayMap(g.name):g.name)+'</strong></td>'+
       '<td>'+fmt(g.count)+'</td><td>'+fmt(g.wins)+'</td>'+
       '<td>'+pct(g.winRate)+'</td><td>'+fmt(g.kills)+'</td>'+
       '<td>'+fmt(g.killsPerMatch,2)+'</td><td>'+fmt(g.damagePerMatch,1)+
@@ -179,7 +184,7 @@
       const values=[...new Set(original.map(m=>label(m[key],key==='map'?'Unknown map':'Unknown mode')))]
         .sort((a,b)=>a.localeCompare(b));
       select.innerHTML='<option value="">'+empty+'</option>'+
-        values.map(v=>'<option value="'+escape(v)+'">'+escape(v)+'</option>').join('');
+        values.map(v=>'<option value="'+escape(v)+'">'+escape(key==='map'?displayMap(v):v)+'</option>').join('');
       select.value=values.includes(previous)?previous:'';
     }
     rerender();
@@ -217,10 +222,10 @@
     const high=Math.max(1,...trend.map(t=>t.value??0));
     $('match-trend').innerHTML=trend.map(t=>{
       const p=t.value===null?0:Math.max(t.value>0?5:2,Math.round(t.value/high*100));
-      return '<div class="match-trend-item" title="'+escape(t.map)+'">'+
+      return '<div class="match-trend-item" title="'+escape(displayMap(t.map))+'">'+
         '<strong>'+fmt(t.value,1)+'</strong><div class="match-trend-rail">'+
         '<span data-height="'+p+'" aria-hidden="true"></span></div>'+
-        '<small>'+escape(t.map)+'</small>'+
+        '<small>'+escape(displayMap(t.map))+'</small>'+
         '<small>'+(t.placement===null?'Place —':'#'+fmt(t.placement))+'</small></div>';
     }).join('')||'<p class="match-empty">No saved matches match these filters.</p>';
     $('match-trend').querySelectorAll('[data-height]').forEach(el=>{
@@ -243,7 +248,7 @@
         escape(detailValue(m,field))+'</strong></div>');
       return '<article class="match-card">'+
         '<header class="match-heading"><div><span class="match-map">'+
-        escape(label(m.map,'Unknown map'))+'</span><span class="badge">'+
+        escape(displayMap(label(m.map,'Unknown map')))+'</span><span class="badge">'+
         escape(label(m.mode,'Unknown mode'))+'</span></div>'+
         '<span class="small muted">'+escape(stamp)+'</span></header>'+
         '<div class="match-metrics">'+metrics.map(([name,v])=>'<div><small>'+

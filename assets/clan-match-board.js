@@ -8,6 +8,11 @@
   if(root&&root.document)root.ClanMatchBoard=mod;
 })(typeof window!=='undefined'?window:globalThis,function(){
   const $=id=>document.getElementById(id);
+  // Display-only translation. Keep source map IDs unchanged for API filtering.
+  const displayMap=value=>{
+    const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+    return dictionary?.mapName?dictionary.mapName(value):value;
+  };
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
@@ -75,7 +80,7 @@
       'killsObserved','kills','killsPerObservedMatch','damageObserved',
       'damage','damagePerObservedMatch','survivalObserved',
       'avgSurvivalSeconds','averagePlacement'];
-    const cells=r=>[days,map||'All maps',mode||'All modes',r.name,r.platform,
+    const cells=r=>[days,displayMap(map||'All maps'),mode||'All modes',r.name,r.platform,
       r.games,r.placed,r.wins,r.winRate,r.top10Rate,r.killsObserved,r.kills,
       r.killsPerGame,r.damageObserved,r.damage,r.damagePerGame,
       r.survivalObserved,r.averageSurvival,r.averagePlacement];
@@ -104,7 +109,7 @@
       const sel=$(id),current=sel.value;
       const values=[...new Set(all.map(r=>r[field]))].sort((a,b)=>a.localeCompare(b));
       sel.innerHTML='<option value="">'+allText+'</option>'+
-        values.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
+        values.map(x=>'<option value="'+esc(x)+'">'+esc(field==='map'?displayMap(x):x)+'</option>').join('');
       sel.value=values.includes(current)?current:'';
     }
     rerender();
@@ -145,7 +150,7 @@
     const mapList=listMaps(stored.rows,mode);
     const max=Math.max(1,...mapList.map(x=>x.count));
     $('clan-board-map-bars').innerHTML=mapList.slice(0,12).map(x=>
-      '<div class="clan-board-map-row"><span>'+esc(x.name)+'</span>'+
+      '<div class="clan-board-map-row"><span>'+esc(displayMap(x.name))+'</span>'+
       '<div class="clan-board-track"><div data-width="'+
       Math.round(x.count/max*100)+'"></div></div><strong>'+fmt(x.count)+'</strong></div>'
     ).join('')||'<p class="small muted">No archived maps in this period.</p>';
