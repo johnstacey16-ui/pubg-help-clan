@@ -312,6 +312,7 @@
     $('match-results').innerHTML='';
     window.MatchLab?.reset();
     window.MatchLobby?.matchesChanged(name,[]);
+    window.LobbyOpponents?.matchesChanged(name,[]);
     if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,[]);
     try{
       var response=await fetch('/api/public-matches?name='+encodeURIComponent(name),{
@@ -324,6 +325,7 @@
       if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,result.matches);
       window.MatchLab?.render(result);
       window.MatchLobby?.matchesChanged(name,result.matches);
+      window.LobbyOpponents?.matchesChanged(name,result.matches);
       $('match-note').textContent=(result.note||'Saved PUBG matches only')+
         ' · '+result.availableCount+' detailed match(es) stored'+
         (result.archivedCount?' · '+result.archivedCount+' archived':'');
@@ -864,6 +866,7 @@
   $('match-reload').addEventListener('click',loadCachedMatches);
   window.MatchLab?.init();
   window.MatchLobby?.init();
+  window.LobbyOpponents?.init();
   window.SquadChemistry?.init();
   window.ClanRecordBook?.init();
   window.ClanActivityPulse?.init();
