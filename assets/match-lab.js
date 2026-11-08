@@ -267,9 +267,9 @@
           (value(member.timeSurvivedSeconds)!==null?' · '+duration(member.timeSurvivedSeconds)+' survived':'')+
           '</span></div>').join(''):
           '<p class="small muted">No squad roster saved for this match.</p>')+
-        '</details><button type="button" class="secondary match-replay-select" data-lobby-match="'+
-         escape(m.id)+'">View saved lobby</button> <button type="button" class="secondary match-replay-select" data-replay-match="'+
-         escape(m.id)+'">Optional 2D replay (large telemetry)</button></article>';
+        '</details><button type="button" class="secondary match-analysis-select" data-lobby-match="'+
+         escape(m.id)+'">View saved lobby</button> <button type="button" class="secondary match-analysis-select" data-combat-match="'+
+         escape(m.id)+'">Analyse combat events</button></article>';
     }).join('')||'<p class="match-empty">No matches match these filters. Change the selection to show more stored reports.</p>';
   }
   function init(){
@@ -278,15 +278,15 @@
     ['match-map-filter','match-mode-filter','match-outcome-filter','match-order','match-trend-metric']
       .forEach(id=>$(id).addEventListener('change',rerender));
     $('match-results').addEventListener('click',e=>{
-      const button=e.target.closest?.('[data-replay-match]');
-      const id=button?.dataset.replayMatch;
+      const button=e.target.closest?.('[data-combat-match]');
+      const id=button?.dataset.combatMatch;
       const select=$('telemetry-match');
       if(!id||!select||![...select.options].some(option=>option.value===id))return;
       select.value=id;
       const optIn=$('telemetry-opt-in');
-      if(optIn)optIn.open=true; // User explicitly selected this optional feature.
+      if(optIn)optIn.open=true; // User explicitly selected optional event analysis.
       $('telemetry-status').textContent='Selected saved match '+id.slice(0,8)+
-       '. Choose Analyse selected match to retrieve actual recorded events, if available.';
+       '. Choose Analyse selected match to inspect genuine combat events, if available.';
       $('telemetry-panel').scrollIntoView({behavior:'smooth',block:'start'});
     });
   }

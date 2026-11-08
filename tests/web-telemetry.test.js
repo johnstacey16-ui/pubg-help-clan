@@ -2,7 +2,6 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const {publicTelemetry,publicRivalTrends,shapeTelemetry,validTelemetryUrl}=require('../lib/web-telemetry');
-const {buildReplay,latestSample,pathSegments}=require('../lib/pubg-replay');
 const uuid='e7ff11aa-2222-3333-4444-555555555555';
 const id='account.player123456789';
 const other='account.other123456789';
@@ -59,19 +58,16 @@ test('trusted telemetry URLs block localhost, credentials, redirects and subdoma
   'https://telemetry-cdn.pubg.com:8443/a','file:///tmp/x'
  ])assert.equal(validTelemetryUrl(url),null,url);
 });
-test('reported replay retains real positions and gaps; rivals exclude team kills',()=>{
- const r=buildReplay(events,'Erangel_Main');
- assert.equal(r.tracks.length,1);
- assert.equal(latestSample(r.tracks[0].samples,40).x,1000);
- assert.equal(pathSegments(r.tracks[0].samples,60,120,30).length,2);
+test('match telemetry captures real combat without position tracks or 2D replays',()=>{
  const shaped=shapeTelemetry(events,id,uuid,{mapName:'Erangel_Main',mode:'squad'});
  assert.equal(shaped.combatSummary.kills,1);
  assert.equal(shaped.combatSummary.revives,1);
  assert.equal(shaped.combatSummary.damageDealt,45);
  assert.equal(shaped.rivals[0].name,'Rival');
  assert.equal(shaped.rivals[0].kills,1);
- assert.equal(shaped.replay.tracks[0].isSelected,true);
- assert.doesNotMatch(JSON.stringify(shaped),/account.player|account.other/);
+ assert.equal(shaped.playerEvents.some(row=>row.type==='LogPlayerPosition'),false);
+ assert.equal('replay' in shaped,false);
+ assert.doesNotMatch(JSON.stringify(shaped),/account.player|account.other|"tracks"|"bounds"|"circles"|"samples"/);
 });
 test('a match without an actual saved participant cannot be queried',async()=>{
  const db=fakeDB({['pubg:v1:console/matches/'+uuid]:matchRecord('account.other')});
@@ -105,7 +101,26 @@ test('first trusted fetch stores bounded report; repeated fetch uses cache',asyn
  assert.equal(db.calls.rpc,1);
 });
 
-test('expanded activity is source-indexed and carries replay jump timestamps',()=>{
+test('legacy cached telemetry returns combat but discards old replay coordinates',async()=>{
+ const key='web:telemetry:v1:'+uuid+':'+id;
+ const legacy={schemaVersion:1,matchId:uuid,combatSummary:{kills:1},
+  rivals:[{name:'Rival',kills:1}],playerEvents:[],
+  replay:{tracks:[{name:'SHOULD_NOT_LEAK',samples:[{x:5,y:9}]}]}};
+ const records={['pubg:v1:console/matches/'+uuid]:matchRecord(),
+  [key]:{payload:legacy,fetched_at:date(0),
+   expires_at:new Date(Date.now()+3600000).toISOString()}};
+ const db=fakeDB(records);
+ const report=await publicTelemetry(db,{name:'Hero',match:uuid},{fetcher:async()=>{
+  throw Error('Legacy cache must not refetch');
+ }});
+ assert.equal(report.status,200);
+ assert.equal(report.body.combatSummary.kills,1);
+ assert.equal(report.body.replay,undefined);
+ assert.doesNotMatch(JSON.stringify(report.body),/SHOULD_NOT_LEAK|"tracks"|"samples"/);
+ assert.equal(db.calls.rpc,0);
+});
+
+test('expanded activity preserves source-relative event times without spatial playback',()=>{
  const records=[...events,
   {_T:'LogPlayerPosition',_D:date(67),character:{accountId:id,name:'Hero',
     location:{x:2000,y:3000,z:0}}},

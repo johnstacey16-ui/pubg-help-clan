@@ -10,7 +10,7 @@ function browser(){
  const nodes={},calls=[];
  function $(id){
   if(nodes[id])return nodes[id];
-  return nodes[id]={id,value:id==='telemetry-zoom'?'1':'',
+  return nodes[id]={id,value:'',
    innerHTML:'',textContent:'',disabled:false,dataset:{},events:{},
    addEventListener(type,callback){this.events[type]=callback;}};
  }
@@ -28,11 +28,7 @@ function browser(){
     {sourceIndex:25,type:'LogPlayerKillV2',
      timestamp:'2026-11-03T12:00:12Z',actor:'Hero',subject:'Opponent',
      timeSeconds:12,damage:null}],
-  activityCoverage:{observed:2,returned:2,truncated:false},
-  replay:{duration:90,mapName:'Erangel_Main',origin:'2026-11-03T12:00:00Z',
-   bounds:{x:0,y:0,size:816000},circles:[],combat:[],
-   tracks:[{key:'t0',name:'Hero',isSelected:true,
-    samples:[{t:0,x:0,y:0,health:100},{t:10,x:20000,y:30000,health:50}]}]}
+  activityCoverage:{observed:2,returned:2,truncated:false}
  };
  const window={
   requestAnimationFrame(){return 1;},cancelAnimationFrame(){},
@@ -70,7 +66,7 @@ function browser(){
  vm.runInNewContext(code,ctx);
  return{get:$,view:window.TelemetryView,report:fakeReport,calls};
 }
-test('event explorer controls, replay player tracks and saved rivals exist',()=>{
+test('event explorer and rival analysis controls remain without map replay tools',()=>{
  for(const id of ['telemetry-event-type','telemetry-event-search',
   'telemetry-event-list','telemetry-event-next','telemetry-event-prev',
   'telemetry-event-count','telemetry-event-export','telemetry-rivals-refresh',
@@ -80,21 +76,31 @@ test('event explorer controls, replay player tracks and saved rivals exist',()=>
   assert.ok(html.includes('id="'+id+'"'),id);
  }
 });
-test('source-indexed event filtering, exact jumps and replay position render',()=>{
+test('source-indexed event filtering retains events without replay or coordinates',()=>{
  const b=browser();
  b.view.matchesChanged('Hero',[{id:b.report.matchId,map:'Erangel_Main'}]);
  b.view.renderForTest(b.report);
  assert.match(b.get('telemetry-event-list').innerHTML,/LogPlayerKillV2/);
- assert.match(b.get('telemetry-event-list').innerHTML,/data-telemetry-jump="12"/);
- assert.match(b.get('telemetry-map').innerHTML,/<svg/);
+ assert.doesNotMatch(b.get('telemetry-event-list').innerHTML,/data-telemetry-jump/);
+ assert.match(b.get('telemetry-event-list').innerHTML,/>40<\/td>/);
  b.get('telemetry-event-type').value='LogPlayerKillV2';
  b.get('telemetry-event-type').events.change();
  assert.doesNotMatch(b.get('telemetry-event-list').innerHTML,/LogPlayerTakeDamage/);
  assert.match(b.get('telemetry-event-list').innerHTML,/LogPlayerKillV2/);
- b.view.jumpToEvent(12);
- assert.equal(b.get('telemetry-time').value,'12');
- assert.match(b.get('telemetry-position').textContent,/sampled 2\.0s ago/);
  assert.equal(b.calls.length,0);
+});
+test('neither dashboard page contains 2D replay controls or a map canvas',()=>{
+ const root=path.join(__dirname,'..');
+ for(const file of ['index.html','training/index.html']){
+  const content=fs.readFileSync(path.join(root,file),'utf8');
+  assert.match(content,/id="telemetry-event-list"/);
+  assert.match(content,/id="telemetry-rivals-table"/);
+  for(const id of ['telemetry-map','telemetry-track','telemetry-play','telemetry-time',
+   'telemetry-zoom','telemetry-speed','telemetry-pan-left'])
+   assert.doesNotMatch(content,new RegExp('id="'+id+'"'),file+' contains '+id);
+  assert.doesNotMatch(content,/2D telemetry replay|Optional legacy 2D replay/);
+ }
+ assert.doesNotMatch(code,/requestAnimationFrame|<svg|data-telemetry-jump|report\\.replay/);
 });
 test('source event search avoids showing missing or invented entries',()=>{
  const b=browser();b.view.renderForTest(b.report);
