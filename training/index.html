@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="/assets/clan-weapon-board.css">
 <link rel="stylesheet" href="/assets/match-lab.css">
 <link rel="stylesheet" href="/assets/match-lobby.css">
+<link rel="stylesheet" href="/assets/lobby-opponents.css">
 <link rel="stylesheet" href="/assets/clan-match-board.css">
 <link rel="stylesheet" href="/assets/clan-activity-pulse.css">
 <link rel="stylesheet" href="/assets/squad-chemistry.css">
@@ -816,6 +817,42 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
           <th>DAMAGE</th><th>HEADSHOTS</th><th>ASSISTS</th><th>SURVIVED</th><th>DEATH TYPE</th>
         </tr></thead><tbody id="lobby-player-table"></tbody></table></div>
         <p class="small muted lobby-footnote">All figures are from saved official PUBG match participants, not telemetry estimates. The participant CSV uses safe spreadsheet cells. Squad totals show their observed-member sample counts, and player filters do not imply that unseen members were absent. Lobbies without a genuine saved original source cannot be reconstructed retroactively.</p>
+      </section>
+
+      <section class="card panel scout-panel" id="scout-panel" aria-labelledby="scout-title">
+        <div class="panel-heading"><div>
+          <p class="eyebrow subtle">180-DAY OFFICIAL MATCH SOURCES · NO EXTRA PUBG REQUESTS</p>
+          <h2 id="scout-title">Opponent Scouting · Saved Lobbies</h2>
+        </div><span class="chip">VERIFIED MATCH ROSTERS</span></div>
+        <p class="small muted">See which visible opponent names appeared on <strong>other recorded squads</strong> in your saved PUBG games. Compare each opponent’s actual match kills, damage and placement, then inspect the source match dates. This uses official full-lobby records, not replay or telemetry downloads.</p>
+        <div class="filters">
+          <label>Observed window <select id="scout-days">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="180">Last 180 days</option>
+          </select></label>
+          <label>Map <select id="scout-map"><option value="">All saved maps</option></select></label>
+          <label>Mode <select id="scout-mode"><option value="">All saved modes</option></select></label>
+          <label>Sort <select id="scout-order">
+            <option value="matches">Most recorded games</option>
+            <option value="kills">Most observed kills</option>
+            <option value="damage">Most observed damage</option>
+            <option value="latest">Latest observed game</option>
+          </select></label>
+          <button class="primary" type="button" id="scout-load" disabled>Read saved opponents</button>
+          <label>Find visible name <input type="search" id="scout-search" maxlength="100" placeholder="Search returned names…" autocomplete="off"></label>
+          <button class="secondary" type="button" id="scout-export" disabled>↓ Export shown CSV</button>
+        </div>
+        <p id="scout-status" class="small muted" aria-live="polite">Select a player in Match Intelligence to read opponents recorded in saved official lobbies.</p>
+        <div id="scout-summary" class="scout-summary" aria-label="Opponent source coverage"></div>
+        <p id="scout-count" class="small muted" aria-live="polite">No opponent groups loaded.</p>
+        <div class="scroll-table"><table><thead><tr>
+          <th>VISIBLE OPPONENT</th><th>MATCHES SEEN</th><th>PLAYER APPEARANCES</th>
+          <th>OPPONENT KILLS</th><th>OPPONENT DAMAGE</th><th>BEST MATCH PLACE</th>
+          <th>LAST SEEN</th><th>NAME COLLISIONS</th>
+        </tr></thead><tbody id="scout-table"></tbody></table></div>
+        <div id="scout-detail" class="scout-detail" aria-live="polite">Choose a visible name from a loaded opponent table.</div>
+        <p class="small muted scout-caution">Data boundaries: Matching visible names do not prove that the same Xbox/PlayStation account was encountered again. Opponent damage and kills are their own recorded whole-match totals, not damage or kills against you. Only other officially assigned rosters are classified as opponents; missing team links are excluded. Up to 75 saved player matches and 80 name groups are examined per report; missing source values are not treated as zero.</p>
       </section>
 
       <details class="telemetry-opt-in" id="telemetry-opt-in">
