@@ -62,7 +62,7 @@
    $('personal-rivals-detail').innerHTML='';
    $('personal-rivals-count').textContent='No rivalry records loaded.';
    $('personal-rivals-status').textContent=player?
-    'Select Show kill rivalries to read previously analysed matches for '+player+'.':
+    'Select Show kill rivalries to read saved automatic and manually analysed fights for '+player+'.':
     'Select a saved player above first.';
   }
  }
@@ -112,7 +112,7 @@
    data=body;
    $('personal-rivals-status').textContent=
     fmt(body.matchesAnalysed)+' of '+fmt(body.matchesScanned)+
-    ' saved combat analyses included. These are confirmed recorded kills, not lifetime totals. '+
+    ' saved combat analyses included. Automatic collection gradually adds verified clan matches. These are confirmed recorded kills, not lifetime totals. '+
     (body.matchesAnalysed===0?
      'Analyse a saved match using the button below to start collecting evidence.':
      'Select an opponent to see the actual match results.');

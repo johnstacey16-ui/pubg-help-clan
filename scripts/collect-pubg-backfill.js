@@ -35,14 +35,17 @@ async function main(){
    if(!response.ok)throw Error('Authenticated backfill endpoint returned HTTP '+response.status+
       '; make sure the updated GitHub commit is deployed before running this job.');
    const result=await response.json();
-   const progress=result.extras||{},season=result.seasonCollection||{};
+   const progress=result.extras||{},season=result.seasonCollection||{},
+    rivalry=result.rivalryCollection||{};
    console.log(JSON.stringify({cycle:i+1,import:result.status,identified:result.identified,
      matched:result.matched,backfillDone:progress.done,backfillTotal:progress.total,
      backfillPending:progress.pending,backfillUnavailable:progress.unavailableTotal,
      seasonAttempted:season.playersAttempted,seasonSaved:season.seasonSaved,
-     rankedSaved:season.rankedSaved,rateLimited:season.rateLimited||progress.rateLimited}));
+     rankedSaved:season.rankedSaved,rateLimited:season.rateLimited||progress.rateLimited,
+     rivalryMatchesClaimed:rivalry.claimed,rivalryMatchesSaved:rivalry.matchesSaved,
+     rivalryPlayerReports:rivalry.playersSaved,rivalryErrors:rivalry.errors}));
    if(result.status==='no_work'&&
-      progress.claimed===0&&season.playersAttempted===0) {
+      progress.claimed===0&&season.playersAttempted===0&&rivalry.claimed===0) {
      console.log('No due backfill jobs. Future-dated maintenance does not waste runner minutes.');
      break;
    }
