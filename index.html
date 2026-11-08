@@ -278,6 +278,20 @@
               <option value="placement">Best placement</option>
             </select></label>
           </div>
+          <section class="recent-form" aria-labelledby="recent-form-heading">
+            <div class="recent-form-heading">
+              <div><p class="eyebrow subtle">PLAYER PERFORMANCE · SAVED MATCHES</p>
+                <h3 id="recent-form-heading">Recent Form · last 10 vs previous 10</h3></div>
+              <span class="chip">SAVED DATA ONLY</span>
+            </div>
+            <p class="small muted">Uses the newest <strong>20 dated, distinct saved games</strong> for the selected player across all maps and modes. Changing the map, placement or sort filters below does not change this comparison. Missing unarchived games cannot be reconstructed, and mixed maps/modes are not difficulty-adjusted.</p>
+            <p id="recent-form-status" class="recent-form-status small" aria-live="polite">Choose a saved player to compare their last 20 dated games.</p>
+            <div class="scroll-table"><table class="recent-form-table">
+              <thead><tr><th scope="col">STATISTIC</th><th scope="col">LATEST 10</th><th scope="col">PREVIOUS 10</th><th scope="col">CHANGE</th></tr></thead>
+              <tbody id="recent-form-rows"></tbody>
+            </table></div>
+            <p class="small muted">Averages include only matches with observed values. Wins and top-10 finishes require recorded placements. Differences appear only when both 10-game windows exist and the metric is recorded for all 20 games. Lower average placement is better.</p>
+          </section>
           <div id="match-lab-summary" class="match-lab-summary" aria-label="Statistics for filtered saved matches"></div>
           <p id="match-lab-coverage" class="small muted match-lab-coverage" aria-live="polite">Choose a player to analyse actual saved matches.</p>
           <div class="match-lab-grid">

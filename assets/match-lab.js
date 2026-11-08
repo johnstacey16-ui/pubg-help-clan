@@ -146,6 +146,79 @@
        playedAt:m.playedAt,
        value:value(m[metric]),placement:value(m.placement)}));
   }
+
+  // Chronological, all-map windows; the UI filters must never affect the sample.
+  // Missing official fields remain unavailable, not guessed zeroes.
+  const FORM_FIELDS=Object.freeze([
+    {key:'killsPerMatch',label:'Kills / game',observed:'killsObserved',digits:2},
+    {key:'damagePerMatch',label:'Damage / game',observed:'damageObserved',digits:1},
+    {key:'wins',label:'Wins',observed:'ranked',digits:0},
+    {key:'top10',label:'Top-10 finishes',observed:'ranked',digits:0},
+    {key:'avgPlace',label:'Average placement',observed:'ranked',digits:1,lowerIsBetter:true}
+  ]);
+  function recentForm(items){
+    const saved=rows(items);
+    const dated=saved.filter(m=>typeof m.playedAt==='string'&&
+      Number.isFinite(Date.parse(m.playedAt)))
+      .sort((a,b)=>Date.parse(b.playedAt)-Date.parse(a.playedAt)||
+        a.id.localeCompare(b.id));
+    const latest=summary(dated.slice(0,10)),previous=summary(dated.slice(10,20));
+    const fullWindows=latest.count===10&&previous.count===10;
+    const metrics=FORM_FIELDS.map(spec=>{
+      const nowObserved=latest[spec.observed],oldObserved=previous[spec.observed];
+      const now=nowObserved?latest[spec.key]:null;
+      const old=oldObserved?previous[spec.key]:null;
+      const complete=fullWindows&&nowObserved===10&&oldObserved===10;
+      const difference=complete?Number((now-old).toFixed(spec.digits)):null;
+      const direction=difference===null?'unavailable':difference===0?'same':
+        ((difference>0)!==Boolean(spec.lowerIsBetter)?'better':'worse');
+      return {...spec,now,old,nowObserved,oldObserved,complete,difference,direction};
+    });
+    const better=metrics.filter(m=>m.direction==='better').length;
+    const worse=metrics.filter(m=>m.direction==='worse').length;
+    let verdict='Not enough history';
+    if(fullWindows){
+      if(metrics.some(m=>!m.complete))verdict='Incomplete stats';
+      else if(better>=3&&worse<=1)verdict='Improving';
+      else if(worse>=3&&better<=1)verdict='Declining';
+      else if(!better&&!worse)verdict='Steady';
+      else verdict='Mixed form';
+    }
+    return {latestCount:latest.count,previousCount:previous.count,
+      datedCount:dated.length,undatedCount:saved.length-dated.length,
+      metrics,verdict,better,worse};
+  }
+  function renderRecentForm(items){
+    const host=$('recent-form-rows'),status=$('recent-form-status');
+    if(!host||!status)return;
+    const form=recentForm(items);
+    const complete=form.latestCount===10&&form.previousCount===10;
+    const count=form.latestCount+' / 10 latest games · '+
+      form.previousCount+' / 10 previous games';
+    status.textContent=form.verdict+' · '+count+
+      (form.undatedCount?' · '+form.undatedCount+' undated saved game(s) excluded':'')+'. '+
+      (!complete?'At least 20 dated saved games are needed for equal 10-game windows.':
+        form.verdict==='Incomplete stats'?
+          'Missing source fields prevent a complete verdict; only fully observed changes are shown.':
+          form.better+' indicators improved and '+form.worse+
+            ' declined. This is descriptive form, not a skill rating.');
+    host.innerHTML=form.metrics.map(m=>{
+      const field=v=>v===null?'—':fmt(v,m.digits);
+      const coverage=n=>'<small>'+n+' / 10 observed</small>';
+      const delta=m.direction==='unavailable'?
+        '<span class="recent-form-change">— Awaiting comparable data</span>':
+        m.direction==='same'?
+          '<span class="recent-form-change same">No change</span>':
+          '<span class="recent-form-change '+m.direction+'">'+
+          (m.difference>0?'↑ +':'↓ −')+fmt(Math.abs(m.difference),m.digits)+
+          ' · '+(m.direction==='better'?'Better':'Worse')+'</span>';
+      return '<tr><th scope="row">'+escape(m.label)+'</th>'+
+        '<td><strong>'+field(m.now)+'</strong>'+coverage(m.nowObserved)+'</td>'+
+        '<td><strong>'+field(m.old)+'</strong>'+coverage(m.oldObserved)+'</td>'+
+        '<td>'+delta+'</td></tr>';
+    }).join('');
+  }
+
   function renderGroup(id,arr){
     $(id).innerHTML=arr.map(g=>'<tr><td><strong>'+escape(id==='match-map-table'?displayMap(g.name):g.name)+'</strong></td>'+
       '<td>'+fmt(g.count)+'</td><td>'+fmt(g.wins)+'</td>'+
@@ -159,6 +232,8 @@
     source=null;knownName=null;
     if(!$('match-lab-summary'))return;
     $('match-lab-summary').innerHTML='';
+    if($('recent-form-rows'))$('recent-form-rows').innerHTML='';
+    if($('recent-form-status'))$('recent-form-status').textContent='Choose a player to compare their last 20 dated saved games.';
     $('match-lab-coverage').textContent='Choose a player to analyse actual saved matches.';
     $('match-map-table').innerHTML='';
     $('match-mode-table').innerHTML='';
@@ -172,6 +247,7 @@
     if(!$('match-lab-summary'))return;
     source=response||null;
     const original=rows(source?.matches);
+    renderRecentForm(original);
     const identity=String(source?.platform||'')+':'+String(source?.name||'');
     if(identity!==knownName){
       knownName=identity;
@@ -295,5 +371,5 @@
       $('telemetry-panel').scrollIntoView({behavior:'smooth',block:'start'});
     });
   }
-  return{rows,filter,summary,groups,recentTrend,squadStats,fmt,pct,duration,deathText,EXTRA_FIELDS,render,rerender,reset,init};
+  return{rows,filter,summary,groups,recentTrend,recentForm,squadStats,fmt,pct,duration,deathText,EXTRA_FIELDS,render,rerender,reset,init};
 });
