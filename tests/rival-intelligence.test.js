@@ -124,7 +124,7 @@ test('large saved report sets are bounded, deduplicated and never fetch PUBG',as
  const result=await publicRivalTrends(db,{name:'Hero',opponent:'Rival A'},
   {now:'2026-11-08T00:00:00Z'});
  assert.equal(result.status,200);
- assert.equal(accessed,2);
+ assert.equal(accessed,3); // verified player plus temporary and 180-day compact cache
  assert.equal(result.body.player,'Hero');
  assert.equal(result.body.platform,'xbox');
  assert.equal(result.body.encounters.length,3);
