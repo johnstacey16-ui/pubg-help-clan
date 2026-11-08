@@ -67,16 +67,18 @@ test('old command centre features are present without shipping fixtures or secre
 });
 
 
-test('telemetry panel and browser runner are bundled without extra public credentials',()=>{
- const html=read('training/index.html'),ui=read('assets/telemetry-view.js');
- for(const id of ['telemetry-panel','telemetry-match','telemetry-load','telemetry-report',
-  'telemetry-time','telemetry-zoom','telemetry-track','telemetry-map','telemetry-play'])
-  assert.ok(html.includes('id="'+id+'"'),id);
- assert.match(read('training/js/clan-dashboard-loader.js'),/assets\/telemetry-view\.js/);
- assert.match(ui,/\/api\/public-telemetry/);
- assert.doesNotMatch(html+ui,/SUPABASE_SERVICE_KEY|PUBG_API_KEY|DISCORD_BOT_TOKEN/);
+test('combat intelligence keeps event/rival tools but permanently excludes 2D replays',()=>{
+  const html=read('training/index.html'),ui=read('assets/telemetry-view.js');
+  for(const id of ['telemetry-panel','telemetry-match','telemetry-load','telemetry-report',
+   'telemetry-event-list','telemetry-rivals-table','telemetry-event-export'])
+   assert.ok(html.includes('id="'+id+'"'),id);
+  for(const id of ['telemetry-time','telemetry-zoom','telemetry-track','telemetry-map','telemetry-play'])
+   assert.ok(!html.includes('id="'+id+'"'),'Obsolete replay control '+id);
+  assert.match(read('training/js/clan-dashboard-loader.js'),/assets\\/telemetry-view\\.js/);
+  assert.match(ui,/\\/api\\/public-telemetry/);
+  assert.doesNotMatch(ui,/requestAnimationFrame|data-telemetry-jump|<svg/);
+  assert.doesNotMatch(html+ui,/SUPABASE_SERVICE_KEY|PUBG_API_KEY|DISCORD_BOT_TOKEN/);
 });
-
 
 test('free Hobby Vercel deployment stays within 12 serverless function builds',()=>{
  const files=fs.readdirSync(path.join(root,'api')).filter(f=>f.endsWith('.js'));
