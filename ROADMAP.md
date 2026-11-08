@@ -76,6 +76,7 @@
 ### Phase 3 — Match intelligence, combat events and opponent analysis
 - [x] Read-only cached PUBG match-intelligence API for saved console players (no public upstream calls)
 - [x] Responsive Match Intelligence website tab with optional squad breakdown
+- [x] Recent Form (player): the newest 10 versus preceding 10 dated, distinct saved games, observed kill/damage averages, wins, top-10 finishes and average placement. Incomplete samples never receive fabricated direction; new player views reuse existing cache-only match endpoint (no additional API calls, server functions or paid dependencies).
 - [x] Verify match-cache shape in Supabase; use existing Discord /recent to populate
 - [x] Persistent match archive for all saved Xbox/PS players, 180-day retention, daily pruning through protected cron
 - [x] Verified automated collector remains active: on 2026-11-07, all 50 cached console-player indexes had been refreshed within 24 hours; 48/50 profile jobs were done and two pending under the shared rate budget.
