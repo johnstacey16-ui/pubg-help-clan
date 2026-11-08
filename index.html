@@ -148,7 +148,7 @@
       </div>
     </section>
     <section class="page" id="page-matches" hidden>
-      <div class="page-head"><p class="eyebrow">CACHED MATCH ANALYSIS</p><h1>Match <em>intelligence.</em></h1><p>Explore map, mode, placement and squad performance from archived matches saved for up to 180 days. Compare real observed reports, or open recorded PUBG telemetry for 2D replays and match-local rivals.</p></div>
+      <div class="page-head"><p class="eyebrow">CACHED MATCH ANALYSIS</p><h1>Match <em>intelligence.</em></h1><p>Explore map, mode, placement and squad performance from archived matches saved for up to 180 days. Compare real observed reports and recorded PUBG combat events, including match-local opponent encounters.</p></div>
       <section class="card panel clan-pulse-panel" aria-labelledby="clan-pulse-heading">
         <div class="panel-heading"><div>
           <p class="eyebrow subtle">REAL PUBG CLAN ACTIVITY · ARCHIVED MATCHES</p>
@@ -349,12 +349,12 @@
       </section>
 
       <details class="telemetry-opt-in" id="telemetry-opt-in">
-        <summary>Optional legacy 2D replay — resource-intensive; closed by default</summary>
+        <summary>Optional combat intelligence and recorded match events</summary>
         <div class="card panel telemetry-panel" id="telemetry-panel">
         <div class="panel-heading"><div><p class="eyebrow subtle">REAL MATCH EVENTS · NO ESTIMATES</p>
-          <h2>Combat intelligence and 2D telemetry replay</h2></div>
-          <span class="chip">REAL RECORDED COORDINATES</span></div>
-        <p class="small muted">The replay requires a genuine saved match with an official PUBG telemetry asset. The server verifies the selected player actually participated, checks the telemetry host, and reuses saved derived reports. Match CDN requests are separate from rate-limited PUBG statistics, but the shared web cooldown still applies.</p>
+          <h2>Combat intelligence and real match events</h2></div>
+          <span class="chip">SOURCE-VERIFIED MATCH EVENTS</span></div>
+        <p class="small muted">Combat analysis uses a genuine saved match with an official PUBG telemetry asset. The server verifies the selected player actually participated, checks the telemetry host, and reuses saved derived reports. Match CDN requests are separate from rate-limited PUBG statistics, but the shared web cooldown still applies.</p>
         <div class="filters">
           <label>Saved match <select id="telemetry-match"></select></label>
           <button id="telemetry-load" type="button" class="primary" disabled>Analyse selected match</button>
@@ -364,7 +364,7 @@
 
         <div class="telemetry-events">
           <div class="panel-heading"><div><h3>Source-indexed player event explorer</h3>
-            <p class="small muted">Find the selected player's meaningful recorded events. Positions remain in the replay tracks. Event indexes refer to the original PUBG telemetry array.</p></div>
+            <p class="small muted">Find the selected player's meaningful recorded events. Event indexes and timestamps refer to the original PUBG telemetry array; no position tracks or playback are shown.</p></div>
             <button id="telemetry-event-export" type="button" class="secondary">Download safe activity JSON</button>
           </div>
           <div class="filters">
@@ -375,7 +375,7 @@
           </div>
           <p id="telemetry-event-count" class="small muted" aria-live="polite">Load real match telemetry to explore events.</p>
           <div class="scroll-table"><table><thead><tr>
-            <th>SOURCE #</th><th>TIME</th><th>TYPE</th><th>ACTOR</th><th>SUBJECT</th><th>REPLAY</th>
+            <th>SOURCE #</th><th>TIME</th><th>TYPE</th><th>ACTOR</th><th>SUBJECT</th><th>DAMAGE</th>
           </tr></thead><tbody id="telemetry-event-list"></tbody></table></div>
           <p class="small muted">The analysis may return a bounded sample of events for exceptionally long matches. Event indexes and genuine event times are preserved; no absent events or positions are invented.</p>
         </div>
@@ -415,23 +415,7 @@
           <p class="small muted rival-caution">Matching visible names across matches does not confirm account identity. Two accounts could share or reuse a name. Only actual logged kills, deaths and damage are counted; unknown damage stays unavailable. Date filters exclude reports without a valid match date.</p>
         </div>
 
-        <div class="telemetry-controls">
-          <label>Player track <select id="telemetry-track"></select></label>
-          <label>Speed <select id="telemetry-speed"><option value="1">1×</option><option value="5" selected>5×</option><option value="15">15×</option><option value="30">30×</option></select></label>
-          <label>Map zoom <select id="telemetry-zoom"><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label>
-          <button id="telemetry-play" type="button" class="secondary">▶ Play</button>
-          <button id="telemetry-reset" type="button" class="secondary">Reset view</button>
-          <button id="telemetry-center" type="button" class="secondary">Centre selected</button>
-          <button id="telemetry-pan-left" type="button" class="secondary" aria-label="Pan map left">←</button>
-          <button id="telemetry-pan-right" type="button" class="secondary" aria-label="Pan map right">→</button>
-          <button id="telemetry-pan-up" type="button" class="secondary" aria-label="Pan map up">↑</button>
-          <button id="telemetry-pan-down" type="button" class="secondary" aria-label="Pan map down">↓</button>
-        </div>
-        <label class="telemetry-time-label">Replay position <input type="range" id="telemetry-time" min="0" max="0" step=".1" value="0"></label>
-        <p id="telemetry-timer" class="small muted">No replay loaded.</p>
-        <div class="telemetry-map" id="telemetry-map" aria-live="off"></div>
-        <p id="telemetry-position" class="small muted">Coordinates appear when an actual recorded track is available.</p>
-        <p class="small muted">This shows telemetry samples, not video, real-time tracking or interpolated movement. Points more than 30 seconds old are faint. Paths break at gaps over 30 seconds. Without a verified matching terrain image, the grid is the correct map background.</p>
+
       </div>
       </details>
     </section>
@@ -874,7 +858,7 @@
         <p class="small muted">Expired entries are not deleted by this panel and may remain available as clearly labelled stale fallbacks elsewhere.</p>
       </div>
     </section>
-    <section class="page" id="page-roadmap" hidden><div class="page-head"><p class="eyebrow">THE DEVELOPMENT PLAN</p><h1>What's <em>next.</em></h1><p>Tracked in GitHub: no claiming features are done before their acceptance checks.</p></div><div class="roadmap-grid"><article class="card panel"><span class="mint">FOUNDATION</span><h3>First working web app</h3><p>Responsive website, saved-data API, roster, leaderboard, modes, comparisons.</p></article><article class="card panel"><span class="lavender">PHASE TWO</span><h3>Profiles and discovery</h3><p>Advanced statistics, real historical snapshots, shareable player profiles.</p></article><article class="card panel"><span class="lavender">PHASE THREE</span><h3>Match, weapon and replay analysis</h3><p>Real match records, rivals, weapons, ranked histories and sampled-coordinate replays.</p></article><article class="card panel"><span class="lavender">PHASE FOUR</span><h3>Protected refresh and release</h3><p>Admin web controls, Discord integration, browser regression and Xbox checks.</p></article></div><div class="card panel"><h3>Saved visual references & roadmap</h3><p>The original vector example pictures are versioned in GitHub.</p><div class="links"><a href="/design/overview-reference.svg" target="_blank" rel="noopener noreferrer">Overview reference ↗</a><a href="/design/leaderboard-reference.svg" target="_blank" rel="noopener noreferrer">Leaderboard reference ↗</a><a href="https://github.com/johnstacey16-ui/Pubg-clan-bot/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer">Full checklist ↗</a></div></div></section>
+    <section class="page" id="page-roadmap" hidden><div class="page-head"><p class="eyebrow">THE DEVELOPMENT PLAN</p><h1>What's <em>next.</em></h1><p>Tracked in GitHub: no claiming features are done before their acceptance checks.</p></div><div class="roadmap-grid"><article class="card panel"><span class="mint">FOUNDATION</span><h3>First working web app</h3><p>Responsive website, saved-data API, roster, leaderboard, modes, comparisons.</p></article><article class="card panel"><span class="lavender">PHASE TWO</span><h3>Profiles and discovery</h3><p>Advanced statistics, real historical snapshots, shareable player profiles.</p></article><article class="card panel"><span class="lavender">PHASE THREE</span><h3>Match, weapon and opponent analysis</h3><p>Real match records, combat events, rivals, weapon mastery and ranked histories. No replay visualizations.</p></article><article class="card panel"><span class="lavender">PHASE FOUR</span><h3>Protected refresh and release</h3><p>Admin web controls, Discord integration, browser regression and Xbox checks.</p></article></div><div class="card panel"><h3>Saved visual references & roadmap</h3><p>The original vector example pictures are versioned in GitHub.</p><div class="links"><a href="/design/overview-reference.svg" target="_blank" rel="noopener noreferrer">Overview reference ↗</a><a href="/design/leaderboard-reference.svg" target="_blank" rel="noopener noreferrer">Leaderboard reference ↗</a><a href="https://github.com/johnstacey16-ui/Pubg-clan-bot/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer">Full checklist ↗</a></div></div></section>
     <footer>CONSOLE//CLAN INTELLIGENCE <span>Xbox + PlayStation · Saved official PUBG data</span><span>Same Discord bot · Same Supabase database</span></footer>
   </main></div>
 </div>
