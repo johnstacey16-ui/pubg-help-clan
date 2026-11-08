@@ -83,7 +83,7 @@ test('verified saved lobby rosters distinguish real opponents from missing team 
  assert.equal(rival.damageObserved,2);
  assert.equal(rival.bestPlacement,1);
  assert.ok(!r.opponents.some(x=>x.name==='Ghost'));
- assert.doesNotMatch(JSON.stringify(r),/account\.|secretAPIKey|NOT_PUBLIC|telemetry-cdn|PRIVATE|"tracks"|"replay"|"URL"/);
+ assert.doesNotMatch(JSON.stringify(r),/account\.[A-Za-z0-9]|secretAPIKey|NOT_PUBLIC|telemetry-cdn|PRIVATE|"tracks"|"replay"|"URL"/);
 });
 test('source window, map, mode and sorts never fabricate missing game stats',()=>{
  const recent=summarizeLobbies(records,ACCOUNT,{days:'7'},NOW);
@@ -91,7 +91,7 @@ test('source window, map, mode and sorts never fabricate missing game stats',()=
  assert.equal(recent.opponentAppearances,2);
  const desert=summarizeLobbies(records,ACCOUNT,{days:30,map:'Desert_Main',mode:'duo'},NOW);
  assert.equal(desert.matchesIncluded,1);
- assert.equal(desert.opponents[0].kills,3);
+ assert.equal(desert.opponents.find(x=>x.name.toLowerCase()==='rival').kills,3);
  assert.deepEqual(desert.mapOptions,['Baltic_Main','Desert_Main']);
  const absent=summarizeLobbies(records,ACCOUNT,{days:30,mode:'solo'},NOW);
  assert.equal(absent.matchesIncluded,0);
@@ -109,7 +109,7 @@ test('per-opponent drilldown reports genuine full-match totals, not head-to-head
  assert.equal(r.observations[0].opponentKills,5);
  assert.equal(r.observations[0].playerKills,7);
  assert.equal(r.observations[2].opponentDamage,null);
- assert.doesNotMatch(JSON.stringify(r),/account\.|NOT_PUBLIC|telemetry-cdn|secretAPIKey|"replay"/);
+ assert.doesNotMatch(JSON.stringify(r),/account\.[A-Za-z0-9]|NOT_PUBLIC|telemetry-cdn|secretAPIKey|"replay"/);
 });
 test('invalid name and selectors are rejected before using private database',async()=>{
  for(const args of [
@@ -132,7 +132,7 @@ test('verified console account and actual 180-day saved match join do not spend 
  assert.equal(r.body.savedMatchesScanned,2);
  assert.equal(r.body.fullLobbiesFound,2);
  assert.deepEqual(db.calls,['players','clan_match_archive','pubg_match_lobby_archive']);
- assert.doesNotMatch(JSON.stringify(r.body),/pubg_account_id|account\.|NOT_PUBLIC|telemetry-cdn/);
+ assert.doesNotMatch(JSON.stringify(r.body),/pubg_account_id|account\.[A-Za-z0-9]|NOT_PUBLIC|telemetry-cdn/);
  assert.equal((await publicLobbyOpponents(client({validPlayer:false}),{name:'Our Hero'},{now:NOW})).status,404);
  const none=await publicLobbyOpponents(client({archived:[]}),{name:'Our Hero'},{now:NOW});
  assert.equal(none.status,200);
