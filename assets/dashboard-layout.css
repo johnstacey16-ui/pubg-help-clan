@@ -1,0 +1,58 @@
+/* Shared dashboard information architecture, standalone + embedded HELP toolkit. */
+.clan-nav-group{display:flex;flex-direction:column;gap:4px;min-width:0}
+.clan-nav-group-label{font-size:10px;line-height:1.5;letter-spacing:1.2px;
+  font-weight:850;text-transform:uppercase;color:var(--muted,#9caec2);margin:6px 8px 4px}
+.clan-nav-group.has-active>.clan-nav-group-label{color:var(--mint,#39e4c3)}
+.sidebar .clan-pages{gap:13px}
+.sidebar .clan-pages .nav-link{width:100%;min-height:39px;padding:8px 12px}
+.clan-page-picker{display:none;gap:7px;min-width:0;color:var(--muted,#a9b6c5);font-size:12px;font-weight:750}
+.clan-page-picker select{width:100%;max-width:100%;min-height:44px;padding:10px 12px;
+  border:1px solid #45637f;border-radius:8px;background:#12243a;color:var(--text,#eef6ff)}
+.overview-shortcuts .section-heading{margin:27px 0 13px}
+.overview-shortcut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.overview-shortcut{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;
+  text-align:left;min-height:162px;padding:16px;border:1px solid #36516b;border-radius:13px;
+  color:var(--text,#edf4ff);background:linear-gradient(140deg,#15283f,#0e1d32);cursor:pointer}
+.overview-shortcut:hover{border-color:var(--mint,#39e4c3);background:#1b344b}
+.overview-shortcut:focus-visible,.match-jump-nav button:focus-visible{outline:3px solid var(--mint,#39e4c3);outline-offset:2px}
+.overview-shortcut .shortcut-icon{color:var(--mint,#39e4c3);font-size:22px;font-weight:850;line-height:1}
+.overview-shortcut strong{font-size:16px;line-height:1.15}
+.overview-shortcut small{color:#b5c7d8;font-size:12px;line-height:1.4}
+.overview-shortcut .shortcut-action{margin-top:auto;color:var(--mint,#39e4c3);font-weight:800;font-size:11px}
+.match-jump-nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;
+  padding:12px;border:1px solid #36516b;background:#12263c;border-radius:12px}
+.match-jump-intro{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--muted,#a6bbcf);margin:0 6px 0 2px}
+.match-jump-nav button{background:#1c344b;color:var(--text,#edf4ff);border:1px solid #43637d;
+  border-radius:9px;padding:9px 13px;font-weight:750;font-size:12px;min-height:41px;white-space:nowrap}
+.match-jump-nav button:hover{border-color:var(--mint,#39e4c3);color:var(--mint,#39e4c3)}
+#page-matches .panel[id]{scroll-margin-top:88px}
+#panel-clan .clan-section-tabs .clan-nav-group{flex:0 0 auto;display:flex;flex-direction:row;align-items:center;
+  border-right:1px solid rgba(181,202,222,.23);padding:0 13px 0 0;margin-right:5px;gap:6px}
+#panel-clan .clan-section-tabs .clan-nav-group-label{margin:0 6px 0 0;font:700 10px/1.3 "IBM Plex Mono",monospace;white-space:nowrap;color:#9ab0c4}
+#panel-clan .clan-section-tabs .clan-nav-group.has-active .clan-nav-group-label{color:var(--mint,#e9bc77)}
+#panel-clan .clan-page-picker{margin:4px clamp(17px,3vw,42px) 10px}
+#panel-clan .clan-page-picker select{background:#111d2b;border-color:#58748a;color:#edf4f8}
+#panel-clan .overview-shortcut{border-color:#405669;border-radius:9px;background:linear-gradient(140deg,#192a3b,#0e1c2b)}
+#panel-clan .overview-shortcut:hover{border-color:var(--mint,#e9bc77)}
+@media(max-width:1120px){
+  .overview-shortcut-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .overview-shortcut{min-height:150px}
+}
+@media(max-width:740px){
+  .clan-page-picker{display:flex;flex-direction:column;margin-bottom:14px}
+  .sidebar .clan-pages{gap:8px;max-width:100%;padding-bottom:6px}
+  .sidebar .clan-nav-group{flex:0 0 auto;align-items:flex-start;gap:2px}
+  .sidebar .clan-nav-group-label{margin:0 0 4px 5px;font-size:10px}
+  .sidebar .clan-nav-group .nav-link{width:auto}
+  #panel-clan .clan-page-picker{display:flex;margin-inline:15px}
+  #panel-clan .clan-section-tabs .clan-nav-group-label{font-size:10px}
+  .match-jump-nav{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin}
+  .match-jump-intro{flex:0 0 auto}
+  .match-jump-nav button{flex:0 0 auto;min-height:44px}
+  .overview-shortcut{min-height:140px;padding:13px}
+  .overview-shortcut strong{font-size:14px}
+  .overview-shortcut small{font-size:11.5px}
+  .hero-actions{flex-wrap:wrap}
+  .hero-actions>*{flex:1 1 145px;min-width:0;text-align:center}
+}
+@media(max-width:380px){.overview-shortcut-grid{grid-template-columns:1fr}.overview-shortcut{min-height:116px}}

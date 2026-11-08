@@ -389,6 +389,36 @@ async function run(){
     '/dashboard/',{waitUntil:'networkidle'});
    assert.equal(response.status(),200);
    await page.locator('#notice').waitFor({state:'hidden',timeout:12000});
+   assert.equal(await page.locator('.clan-nav-group').count(),6,'6 labelled dashboard groups');
+   assert.equal(await page.locator('.clan-nav-group [data-page]').count(),19,'original sections remain available');
+   assert.equal(await page.locator('#clan-page-select option').count(),19);
+   assert.equal(await page.locator('.overview-shortcut').count(),4);
+   if(width===390){
+    assert.equal(await page.locator('.clan-page-picker').isVisible(),true);
+    await page.locator('#clan-page-select').selectOption('matches');
+    await page.locator('#page-matches').waitFor({state:'visible'});
+    assert.equal(await page.locator('#crumb').textContent(),'Match intelligence');
+    await page.locator('#clan-page-select').selectOption('overview');
+    await page.locator('#page-overview').waitFor({state:'visible'});
+   }
+   await page.locator('.overview-shortcut[data-match-jump="match-performance-panel"]').click();
+   await page.locator('#page-matches').waitFor({state:'visible'});
+   assert.equal(await page.locator('#match-performance-panel').count(),1);
+   assert.equal(await page.locator('#recent-form-heading').count(),1);
+   assert.equal(await page.locator('.match-jump-nav [data-match-jump]').count(),6);
+   const playerFirst=await page.evaluate(()=>
+    !!(document.getElementById('match-performance-panel')
+       .compareDocumentPosition(document.getElementById('clan-pulse-panel'))&
+      Node.DOCUMENT_POSITION_FOLLOWING));
+   assert.equal(playerFirst,true,'player form must precede clan reports');
+   await page.locator('.match-jump-nav [data-match-jump="personal-rivals-panel"]').click();
+   assert.equal(await page.locator('#personal-rivals-panel').isVisible(),true);
+   await page.locator('[data-page="overview"]').click();
+   await page.locator('.overview-shortcut[data-match-jump="clan-board-panel"]').click();
+   await page.locator('#page-matches').waitFor({state:'visible'});
+   assert.equal(await page.locator('#clan-board-panel').isVisible(),true);
+   await page.locator('[data-page="overview"]').click();
+
    await page.locator('[data-page="full-stats"]').click();
    await page.locator('#page-full-stats').waitFor({state:'visible'});
    assert.equal(await page.locator('#full-player option').count(),1);

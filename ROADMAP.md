@@ -76,6 +76,7 @@
 ### Phase 3 — Match intelligence, combat events and opponent analysis
 - [x] Read-only cached PUBG match-intelligence API for saved console players (no public upstream calls)
 - [x] Responsive Match Intelligence website tab with optional squad breakdown
+- [x] UX refresh: grouped yet accessible standalone and toolkit navigation, mobile section picker, homepage shortcuts to form/rivals/clan match history, player-first Match Intelligence, and in-page section links, with unchanged data sources or APIs.
 - [x] Recent Form (player): the newest 10 versus preceding 10 dated, distinct saved games, observed kill/damage averages, wins, top-10 finishes and average placement. Incomplete samples never receive fabricated direction; new player views reuse existing cache-only match endpoint (no additional API calls, server functions or paid dependencies).
 - [x] Verify match-cache shape in Supabase; use existing Discord /recent to populate
 - [x] Persistent match archive for all saved Xbox/PS players, 180-day retention, daily pruning through protected cron
