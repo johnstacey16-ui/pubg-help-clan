@@ -95,6 +95,34 @@ const server=http.createServer(async(req,res)=>{
  if(uri.pathname==='/api/public-stats')return respond(res,200,summary);
  if(uri.pathname==='/api/player-lookup')return respond(res,200,{
   schemaVersion:1,found:true,isClanMember:false,player:outsider});
+ if(uri.pathname==='/api/public-matches'&&uri.searchParams.get('route')==='opponents'){
+  const selected=uri.searchParams.get('opponent'),span=Number(uri.searchParams.get('days')||30);
+  const common={schemaVersion:1,windowDays:span,filterMap:uri.searchParams.get('map')||'',
+   filterMode:uri.searchParams.get('mode')||'',sort:uri.searchParams.get('sort')||'matches',
+   name:'Sample Member',platform:'xbox',savedMatchesScanned:4,fullLobbiesFound:3,
+   lobbyReportsVerified:3,lobbyReportsClassified:3,matchesIncluded:3,
+   opponentAppearances:5,opponentNames:2,opponentsReturned:2,
+   mapOptions:['Baltic_Main','Desert_Main'],modeOptions:['squad','duo'],
+   source:'180-day official saved full-match archive',
+   note:'Official PUBG lobby participants from verified different rosters. Names are visible labels only.'};
+  if(selected)return respond(res,200,{...common,kind:'lobby-opponent-detail',
+   opponent:selected,observationsAvailable:2,observationsReturned:2,
+   observations:[{matchId:'00336e4b-d659-4497-bfc4-9f6dd705cc71',
+    playedAt:'2026-11-05T14:00:00Z',map:'Baltic_Main',mode:'squad',
+    opponentKills:8,opponentDamage:900,opponentPlacement:1,
+    playerKills:7,playerDamage:800,playerPlacement:2},
+    {matchId:'00336e4b-d659-4497-bfc4-9f6dd705cc72',
+    playedAt:'2026-11-04T14:00:00Z',map:'Desert_Main',mode:'duo',
+    opponentKills:2,opponentDamage:null,opponentPlacement:12,
+    playerKills:1,playerDamage:250,playerPlacement:15}]});
+  return respond(res,200,{...common,kind:'lobby-opponent-scout',
+   opponents:[{name:'Rival Player',matchesObserved:2,participantAppearances:2,
+    kills:10,killsObserved:2,damage:900,damageObserved:1,bestPlacement:1,
+    latestMatchAt:'2026-11-05T14:00:00Z',nameCollisionMatches:0},
+   {name:'Another Opponent',matchesObserved:1,participantAppearances:1,
+    kills:null,killsObserved:0,damage:null,damageObserved:0,bestPlacement:12,
+    latestMatchAt:'2026-11-04T14:00:00Z',nameCollisionMatches:0}]});
+ }
  if(uri.pathname==='/api/public-matches'&&uri.searchParams.get('route')==='lobby')
   return respond(res,200,{
    schemaVersion:1,kind:'match-lobby',matchId:'00336e4b-d659-4497-bfc4-9f6dd705cc71',
@@ -647,6 +675,31 @@ async function run(){
    assert.equal(await page.locator('#lobby-export').isEnabled(),true);
    await page.locator('#lobby-search').fill('');
    await page.locator('#lobby-team-scope').selectOption('all');
+
+   await page.locator('#scout-load').click();
+   await page.waitForFunction(()=>document.getElementById('scout-table')?.
+    textContent.includes('Rival Player'),{timeout:12000});
+   assert.equal(await page.locator('#scout-table tr').count(),2);
+   assert.match(await page.locator('#scout-summary').innerText(),/Saved match references/);
+   assert.match(await page.locator('#scout-status').innerText(),/saved full-match archive/);
+   await page.locator('#scout-search').fill('Rival');
+   assert.equal(await page.locator('#scout-table tr').count(),1);
+   await page.locator('#scout-search').fill('');
+   await page.locator('#scout-order').selectOption('damage');
+   await page.waitForFunction(()=>document.getElementById('scout-status')?.
+    textContent.includes('saved full-match archive'),{timeout:12000});
+   await page.locator('#scout-map').selectOption('Baltic_Main');
+   await page.waitForFunction(()=>document.getElementById('scout-table')?.
+    textContent.includes('Rival Player'),{timeout:12000});
+   await page.locator('[data-scout-name="Rival Player"]').click();
+   await page.waitForFunction(()=>document.getElementById('scout-detail')?.
+    textContent.includes('900'),{timeout:12000});
+   assert.match(await page.locator('#scout-detail').innerText(),/whole-match totals/);
+   assert.match(await page.locator('#scout-detail').innerText(),/Desert_Main/);
+   assert.equal(await page.locator('#scout-export').isEnabled(),true);
+   assert.equal(await page.locator('#telemetry-map').count(),0,
+    'Scouting must never reintroduce the retired 2D replay map');
+
 
    await page.locator('[data-page="health"]').click();
    await page.locator('#page-health').waitFor({state:'visible'});

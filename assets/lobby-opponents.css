@@ -1,0 +1,22 @@
+/* Source-only PUBG full-lobby opponent scouting. No map or playback UI. */
+.scout-panel{margin:24px 0}
+.scout-panel .filters{margin:14px 0;align-items:end;gap:12px}
+.scout-panel .filters label{flex:1 1 170px}
+.scout-panel .filters select,.scout-panel .filters input{width:100%;min-width:0}
+.scout-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0}
+.scout-kpi{background:rgba(13,28,47,.45);border:1px solid rgba(111,154,178,.28);border-radius:10px;padding:14px}
+.scout-kpi small{display:block;color:#a5c0d1;font-size:12px}
+.scout-kpi strong{display:block;font-size:21px;line-height:1.5;font-variant-numeric:tabular-nums}
+.scout-panel .scroll-table{max-width:100%;overflow-x:auto}
+.scout-panel table{min-width:820px}
+.scout-name{background:transparent;border:0;padding:4px 2px;color:#7ce9d7;text-decoration:underline;text-align:left;font-weight:650;cursor:pointer}
+.scout-name:focus-visible{outline:3px solid #ffe18a;outline-offset:4px;border-radius:4px}
+.scout-samples{display:block;color:#a5bdd0;font-size:11px}
+.scout-detail{margin-top:16px}
+.scout-detail h4{margin:10px 0}
+.scout-caution{border-top:1px solid rgba(111,154,178,.28);padding-top:12px}
+@media(max-width:600px){
+ .scout-panel .filters label{flex:1 1 135px}
+ .scout-kpi{padding:10px}
+ .scout-kpi strong{font-size:18px}
+}
