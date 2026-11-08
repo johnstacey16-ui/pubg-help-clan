@@ -530,7 +530,7 @@ async function run(){
     el=>parseFloat(el.style.height));
    assert.ok(chartHeight>0,'Saved match trend bars must have actual CSSOM heights');
    assert.equal(await page.locator('#telemetry-opt-in').getAttribute('open'),null);
-   await page.locator('#match-results [data-replay-match]').first().click();
+   await page.locator('#match-results [data-combat-match]').first().click();
    assert.notEqual(await page.locator('#telemetry-opt-in').getAttribute('open'),null);
 
    assert.equal(await page.locator('#telemetry-match').inputValue(),
