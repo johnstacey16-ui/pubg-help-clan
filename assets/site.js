@@ -132,6 +132,11 @@
       if (el.dataset.page === page) el.setAttribute('aria-current','page');
       else el.removeAttribute('aria-current');
     });
+    var switcher=$('clan-page-select');
+    if(switcher)switcher.value=page;
+    document.querySelectorAll('.clan-nav-group').forEach(function(group){
+      group.classList.toggle('has-active',!!group.querySelector('.nav-link.active'));
+    });
     $('crumb').textContent = {overview:'Overview',leaderboard:'Leaderboards',players:'Player roster',modes:'Game modes','full-stats':'Complete player stats',compare:'Compare',matches:'Match intelligence',weapons:'Weapon mastery',season:'Season & ranked',teammates:'Teammate insights',awards:'Clan awards',analysis:'Deep analysis','data-tools':'Data workbench',help:'Analytics guide',survival:'Survival mastery',sources:'PUBG data library',global:'Official regional ranks',health:'Data health',roadmap:'Roadmap'}[page];
     // The dashboard is lazy-loaded inside the shared HELP toolkit. It can
     // finish booting after a user has already returned to another tool.
@@ -799,6 +804,20 @@
   }
   document.querySelectorAll('[data-page]').forEach(function (b) { b.addEventListener('click',function () {go(b.dataset.page);}); });
   document.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click',function () {go(b.dataset.go);}); });
+  var pagePicker=$('clan-page-select');
+  if(pagePicker)pagePicker.addEventListener('change',function(){go(pagePicker.value);});
+  // Shortcut and in-page navigation share stable IDs and never alter stored match data.
+  var jumpTargets=['match-performance-panel','personal-rivals-panel','clan-pulse-panel',
+    'clan-board-panel','lobby-panel','scout-panel'];
+  document.querySelectorAll('[data-match-jump]').forEach(function(button){
+    button.addEventListener('click',function(){
+      var id=button.dataset.matchJump;
+      if(jumpTargets.indexOf(id)===-1)return;
+      if(current!=='matches')go('matches');
+      var section=document.getElementById(id);
+      if(section)section.scrollIntoView({block:'start'});
+    });
+  });
   document.addEventListener('click',function (e) {
     var favourite=e.target.closest&&e.target.closest('[data-favourite]');
     if(favourite)toggleRosterFavourite(favourite.dataset.favourite);
