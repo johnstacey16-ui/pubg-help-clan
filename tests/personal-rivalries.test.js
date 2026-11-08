@@ -45,5 +45,6 @@ test('saved rival server reports compute leaders over ALL valid groups',()=>{
  const s=readSource();
  assert.match(s,/const all=\[\.\.\.rivals\.values\(\)\]/);
  assert.match(s,/killLeaders/);
+ assert.match(s,/web:kill-rivalry:v1:/);
 });
 function readSource(){return fs.readFileSync(path.join(__dirname,'../lib/web-rival-intelligence.js'),'utf8');}

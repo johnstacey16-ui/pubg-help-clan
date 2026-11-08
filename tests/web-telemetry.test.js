@@ -93,7 +93,10 @@ test('first trusted fetch stores bounded report; repeated fetch uses cache',asyn
  assert.equal(first.status,200);
  assert.equal(first.body.cache,'saved');
  assert.equal(first.body.combatSummary.kills,1);
- assert.equal(db.calls.upsert,1);
+ assert.equal(db.calls.upsert,2);
+ assert.ok(records['web:kill-rivalry:v1:'+uuid+':'+id]);
+ assert.equal(records['web:kill-rivalry:v1:'+uuid+':'+id].payload.rivals[0].kills,1);
+ assert.ok(Date.parse(records['web:kill-rivalry:v1:'+uuid+':'+id].expires_at)>Date.now());
  const second=await publicTelemetry(db,{name:'Hero',match:uuid},{fetcher});
  assert.equal(second.status,200);
  assert.equal(second.body.cache,'saved');
@@ -143,7 +146,8 @@ function trendDb(accountRecords,allPlayers=[{gamertag:'Hero',platform:'xbox',pub
    if(table==='pubg_endpoint_cache')return{
     select(){return this;},like(col,pattern){
      assert.equal(col,'cache_key');
-     assert.ok(pattern.startsWith('web:telemetry:v1:%:'));
+     assert.ok(pattern.startsWith('web:telemetry:v1:%:')||
+      pattern.startsWith('web:kill-rivalry:v1:%:'));
      return this;
     },order(){return this;},
     async limit(){return{data:accountRecords,error:null};}
