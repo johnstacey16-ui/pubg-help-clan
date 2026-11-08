@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="/assets/match-lab.css">
 <link rel="stylesheet" href="/assets/match-lobby.css">
 <link rel="stylesheet" href="/assets/lobby-opponents.css">
+<link rel="stylesheet" href="/assets/personal-rivalries.css">
 <link rel="stylesheet" href="/assets/clan-match-board.css">
 <link rel="stylesheet" href="/assets/clan-activity-pulse.css">
 <link rel="stylesheet" href="/assets/squad-chemistry.css">
@@ -781,6 +782,41 @@ body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--hu
       </div>
 
       
+
+      <section class="card panel personal-rivals-panel" id="personal-rivals-panel" aria-labelledby="personal-rivals-title">
+        <div class="panel-heading"><div>
+          <p class="eyebrow subtle">REAL PLAYER KILLS · NO REPLAY OR GUESSED FIGHTS</p>
+          <h2 id="personal-rivals-title">Personal Kill Rivalries</h2>
+        </div><span class="chip">RECORDED COMBAT</span></div>
+        <p class="small muted">Find who your selected player has eliminated most often, and who has eliminated them most often. These are <strong>actual kill events</strong> from analysed PUBG match telemetry — not another player's total match kills.</p>
+        <p class="small muted">Viewing rivalries for <strong id="personal-rivals-player">Choose a saved player above</strong></p>
+        <div class="filters">
+          <label>Recorded period <select id="personal-rivals-days">
+            <option value="0">All analysed dates</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="180">Last 180 days</option>
+          </select></label>
+          <button class="primary" id="personal-rivals-load" type="button" disabled>Show kill rivalries</button>
+          <label>Find an opponent <input id="personal-rivals-search" type="search" maxlength="90" autocomplete="off" placeholder="Search recorded names…"></label>
+          <label>Rank by <select id="personal-rivals-sort">
+            <option value="kills">Most killed by you</option>
+            <option value="deaths">Most times they killed you</option>
+            <option value="trades">Most fights recorded</option>
+          </select></label>
+        </div>
+        <p id="personal-rivals-status" class="small muted" aria-live="polite">Select a player above, then show their saved kill rivalries.</p>
+        <div id="personal-rivals-highlights" class="personal-rivals-highlights" aria-label="Most killed and most killed by"></div>
+        <p id="personal-rivals-count" class="small muted">No rivalry records loaded.</p>
+        <div class="scroll-table"><table>
+          <thead><tr><th>RECORDED OPPONENT</th><th>YOU KILLED THEM</th><th>THEY KILLED YOU</th><th>KILL DIFFERENCE</th><th>RECORDED MATCHES</th></tr></thead>
+          <tbody id="personal-rivals-table"></tbody>
+        </table></div>
+        <div id="personal-rivals-detail" class="personal-rivals-detail" aria-live="polite"></div>
+        <p class="small muted personal-rivals-explainer">Only matches whose combat events have already been analysed count here. A missing match is not a zero-kill match. Player names from older saved reports are grouped by displayed name, which cannot guarantee one account across matches. Team kills, suicides and environmental deaths do not count as player rivalries.</p>
+        <button class="secondary" type="button" id="personal-rivals-analyse">Analyse another saved match</button>
+      </section>
+
       <section class="card panel lobby-panel" id="lobby-panel" aria-labelledby="lobby-title">
         <div class="panel-heading"><div>
           <p class="eyebrow subtle">OFFICIAL SAVED MATCH · FULL LOBBY</p>
