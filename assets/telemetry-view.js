@@ -2,6 +2,11 @@
 // Source-only PUBG combat/event analysis. No 2D replay or position tracking.
 (function(){
  const $=id=>document.getElementById(id);
+ // Display-only translation. Keep source map IDs unchanged for API filtering.
+ const displayMap=value=>{
+   const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+   return dictionary?.mapName?dictionary.mapName(value):value;
+ };
  const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({
   '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  })[c]);
@@ -16,7 +21,7 @@
   report=null;
   const select=$('telemetry-match'),previous=select.value;
   select.innerHTML=matches.map(m=>
-   '<option value="'+escape(m.id)+'">'+escape(m.map||'Unknown map')+
+   '<option value="'+escape(m.id)+'">'+escape(displayMap(m.map||'Unknown map'))+
    ' · '+escape(m.playedAt||'saved match')+' · '+escape(m.id.slice(0,8))+'</option>'
   ).join('');
   if(matches.some(m=>m.id===previous))select.value=previous;
@@ -98,7 +103,7 @@
   const labels=Array.isArray(values)?values.filter(v=>
    typeof v==='string'&&v.trim()&&v.length<=100):[];
   select.innerHTML='<option value="">'+fallback+'</option>'+
-   labels.map(v=>'<option value="'+escape(v)+'">'+escape(v)+'</option>').join('');
+   labels.map(v=>'<option value="'+escape(v)+'">'+escape(id==='telemetry-rivals-map'?displayMap(v):v)+'</option>').join('');
   select.value=old&&labels.includes(old)?old:'';
  }
  function renderRivalRows(){
@@ -187,7 +192,7 @@
     '<th>THEY KILLED YOU</th><th>DAMAGE DEALT</th><th>DAMAGE TAKEN</th>'+
     '</tr></thead><tbody>'+
     data.encounters.map(m=>'<tr><td>'+escape(dateLabel(m.playedAt))+
-     '</td><td>'+escape(m.map)+'</td><td>'+escape(m.mode)+
+     '</td><td>'+escape(displayMap(m.map))+'</td><td>'+escape(m.mode)+
      '</td><td>'+n(m.kills)+'</td><td>'+n(m.deaths)+
      '</td><td>'+n(m.damageDealt)+'</td><td>'+n(m.damageTaken)+'</td></tr>'
     ).join('')+'</tbody></table></div>';

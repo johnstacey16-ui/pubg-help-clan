@@ -70,6 +70,9 @@
 - [ ] Verify progression charts with two different genuine refresh timestamps from PUBG production
 - [ ] End-to-end production browser, Android and Xbox validation
 
+### PUBG map labels
+- [x] Display publisher map identifiers as in-game map names everywhere in player match history, match lab filters and charts, clan match board, saved lobby, opponent scout, recorded kill rivalries, clan record book and Discord squad analysis. Keep exact source IDs for match and map filters; leave unknown IDs unchanged, and never rewrite historic match archives. Canonical mapping comes from the pinned PUBG developer map dictionary; Baltic_Main displays as Erangel, Tiger_Main as Taego, Desert_Main as Miramar.
+
 ### Phase 3 — Match intelligence, combat events and opponent analysis
 - [x] Read-only cached PUBG match-intelligence API for saved console players (no public upstream calls)
 - [x] Responsive Match Intelligence website tab with optional squad breakdown

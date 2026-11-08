@@ -6,6 +6,11 @@
  if(root&&root.document)root.LobbyOpponents=api;
 })(typeof window!=='undefined'?window:globalThis,function(){
  const $=id=>document.getElementById(id);
+ // Display-only translation. Keep source map IDs unchanged for API filtering.
+ const displayMap=value=>{
+   const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+   return dictionary?.mapName?dictionary.mapName(value):value;
+ };
  const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({
   '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  })[c]);
@@ -59,7 +64,7 @@
   const select=$(id),old=select.value;
   const valid=Array.isArray(items)?items.filter(x=>typeof x==='string'&&x.length<=90):[];
   select.innerHTML='<option value="">'+escape(placeholder)+'</option>'+
-   valid.map(x=>'<option value="'+escape(x)+'">'+escape(x)+'</option>').join('');
+   valid.map(x=>'<option value="'+escape(x)+'">'+escape(id==='scout-map'?displayMap(x):x)+'</option>').join('');
   select.value=old&&valid.includes(old)?old:'';
  }
  function visibleRows(data,query){
@@ -142,7 +147,7 @@
     '<th>OPPONENT PLACE</th><th>OPPONENT KILLS</th><th>OPPONENT DAMAGE</th>'+
     '<th>YOUR SQUAD PLACE</th><th>YOUR KILLS</th><th>YOUR DAMAGE</th>'+
     '</tr></thead><tbody>'+data.observations.map(r=>
-     '<tr><td>'+escape(date(r.playedAt))+'</td><td>'+escape(r.map)+
+     '<tr><td>'+escape(date(r.playedAt))+'</td><td>'+escape(displayMap(r.map))+
      ' · '+escape(r.mode)+'</td><td>'+fmt(r.opponentPlacement)+
      '</td><td>'+fmt(r.opponentKills)+'</td><td>'+fmt(r.opponentDamage,1)+
      '</td><td>'+fmt(r.playerPlacement)+'</td><td>'+fmt(r.playerKills)+

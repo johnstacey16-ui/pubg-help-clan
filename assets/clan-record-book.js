@@ -7,6 +7,11 @@
  if(root&&root.document)root.ClanRecordBook=api;
 })(typeof window!=='undefined'?window:globalThis,function(){
  const $=id=>document.getElementById(id);
+ // Display-only translation. Keep source map IDs unchanged for API filtering.
+ const displayMap=value=>{
+   const dictionary=typeof window!=='undefined'?window.PubgReference:null;
+   return dictionary?.mapName?dictionary.mapName(value):value;
+ };
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
   '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  })[c]);
@@ -82,7 +87,7 @@
    esc(r.name)+'">'+esc(r.name)+'</button><small class="clan-record-platform">'+
    (r.platform==='xbox'?'Xbox':'PlayStation')+'</small></td>'+
    '<td><strong>'+esc(value(r.value,chosen.unit))+'</strong></td>'+
-   '<td>'+esc(r.map)+'</td><td>'+esc(r.mode)+'</td>'+
+   '<td>'+esc(displayMap(r.map))+'</td><td>'+esc(r.mode)+'</td>'+
    '<td>'+esc(new Date(r.playedAt).toLocaleDateString('en-GB',{
     year:'numeric',month:'short',day:'numeric',timeZone:'UTC'
    }))+'</td></tr>'
