@@ -45,7 +45,7 @@ test('map filters keep raw values while their labels use human names',()=>{
   assert.match(content,/<option value=/,file);
  }
  for(const file of ['assets/personal-rivalries.js','assets/match-lobby.js',
-  'assets/clan-record-book.js','lib/squad-analysis.js']){
+  'assets/clan-record-book.js','assets/squad-chemistry.js','lib/squad-analysis.js']){
   const content=fs.readFileSync(path.join(base,file),'utf8');
   assert.match(content,/displayMap\(|mapName\(/,file);
  }

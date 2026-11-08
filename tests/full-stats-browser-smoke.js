@@ -405,7 +405,7 @@ async function run(){
    await page.locator('#teammates-sort').selectOption('winRate');
    assert.match(await page.locator('#teammates-table tr').first().innerText(),/Mate A/);
    await page.locator('#teammates-partner').selectOption('Mate A');
-   assert.match(await page.locator('#teammates-detail').innerText(),/Baltic_Main/);
+   assert.match(await page.locator('#teammates-detail').innerText(),/Erangel/);
    assert.match(await page.locator('#teammates-detail').innerText(),/5? games|4 games/);
    const duoBar=await page.locator('#teammates-bars [data-width]').first()
     .evaluate(el=>parseFloat(el.style.width));
@@ -469,7 +469,7 @@ async function run(){
    await page.locator('[data-page="matches"]').click();
    await page.locator('#page-matches').waitFor({state:'visible'});
    await page.waitForFunction(()=>document.getElementById('match-map-table')?.
-    textContent.includes('Baltic_Main'),{timeout:12000});
+    textContent.includes('Erangel'),{timeout:12000});
    await page.waitForFunction(()=>document.getElementById('clan-board-status')
     ?.textContent.includes('Saved comparison ready'),{timeout:12000});
    await page.waitForFunction(()=>document.getElementById('clan-pulse-status')
@@ -505,6 +505,7 @@ async function run(){
    assert.equal(await page.locator('#clan-board-table tr').count(),2);
    assert.match(await page.locator('#clan-board-kpis').innerText(),/50/);
    assert.match(await page.locator('#clan-board-note').innerText(),/not lifetime/i);
+   assert.equal(await page.locator('#clan-board-map option[value="Baltic_Main"]').innerText(),'Erangel');
    await page.locator('#clan-board-map').selectOption('Baltic_Main');
    assert.equal(await page.locator('#clan-board-table tr').count(),2);
    await page.locator('#clan-board-sort').selectOption('winRate');
@@ -534,8 +535,9 @@ async function run(){
    assert.equal(await page.locator('#match-results article').count(),4);
    assert.match(await page.locator('#match-lab-coverage').innerText(),/4 of 4/);
    assert.match(await page.locator('#match-lab-coverage').innerText(),/NOT lifetime totals/);
-   assert.match(await page.locator('#match-map-table').innerText(),/Baltic_Main/);
+   assert.match(await page.locator('#match-map-table').innerText(),/Erangel/);
    assert.match(await page.locator('#match-map-table').innerText(),/50%/);
+   assert.equal(await page.locator('#match-map-filter option[value="Baltic_Main"]').innerText(),'Erangel');
    await page.locator('#match-map-filter').selectOption('Baltic_Main');
    assert.equal(await page.locator('#match-results article').count(),2);
    assert.match(await page.locator('#match-lab-coverage').innerText(),/2 of 4/);
@@ -575,11 +577,12 @@ async function run(){
     await page.locator('#telemetry-rivals-search').fill('');
     await page.locator('[data-rival-name="Rival Player"]').click();
     await page.waitForFunction(()=>document.getElementById('telemetry-rival-detail')
-     ?.textContent.includes('Desert_Main'),{timeout:12000});
+     ?.textContent.includes('Miramar'),{timeout:12000});
     assert.match(await page.locator('#telemetry-rival-detail').innerText(),/unavailable, not zero/);
     await page.locator('#telemetry-rivals-days').selectOption('7');
     await page.waitForFunction(()=>document.getElementById('telemetry-rivals-note')
      ?.textContent.includes('Last 7 days'),{timeout:12000});
+    assert.equal(await page.locator('#telemetry-rivals-map option[value="Desert_Main"]').innerText(),'Miramar');
     await page.locator('#telemetry-rivals-map').selectOption('Desert_Main');
     await page.waitForFunction(()=>document.getElementById('telemetry-rivals-count')
      ?.textContent.includes('1 visible name'),{timeout:12000});
@@ -688,6 +691,7 @@ async function run(){
    await page.locator('#scout-order').selectOption('damage');
    await page.waitForFunction(()=>document.getElementById('scout-status')?.
     textContent.includes('saved full-match archive'),{timeout:12000});
+   assert.equal(await page.locator('#scout-map option[value="Baltic_Main"]').innerText(),'Erangel');
    await page.locator('#scout-map').selectOption('Baltic_Main');
    await page.waitForFunction(()=>document.getElementById('scout-table')?.
     textContent.includes('Rival Player'),{timeout:12000});
@@ -695,7 +699,7 @@ async function run(){
    await page.waitForFunction(()=>document.getElementById('scout-detail')?.
     textContent.includes('900'),{timeout:12000});
    assert.match(await page.locator('#scout-detail').innerText(),/whole-match totals/);
-   assert.match(await page.locator('#scout-detail').innerText(),/Desert_Main/);
+   assert.match(await page.locator('#scout-detail').innerText(),/Miramar/);
    assert.equal(await page.locator('#scout-export').isEnabled(),true);
    assert.equal(await page.locator('#telemetry-map').count(),0,
     'Scouting must never reintroduce the retired 2D replay map');
