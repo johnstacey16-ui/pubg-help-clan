@@ -3,7 +3,8 @@
 **Repository:** johnstacey16-ui/pubg-help-clan  
 **Production target:** https://pubg-help-clan.vercel.app (HELP Toolkit); `/dashboard/` (Clan Dashboard)  
 **Services:** existing Vercel Hobby, Supabase, official PUBG console API, Discord bot  
-**Rules:** free hosting where possible; never expose credentials; Xbox & PlayStation only; real telemetry 2D replays are permitted (no invented paths); complete checks only when tests pass.
+**Permanent exclusion (owner decision, 2026-11-08):** Never build, enable or reintroduce 2D replay visualizations, position tracks, map playback or replay controls. Maintain existing combat, squad, match and rival statistics without spatial replay data. This supersedes earlier replay requests.  
+**Rules:** free hosting where possible; never expose credentials; Xbox & PlayStation only; 2D replays, position maps, animated tracks and playback are permanently excluded by the project owner; genuine non-spatial match/telemetry statistics are permitted; complete checks only when tests pass.
 
 ## Completed in the initial web-app foundation (2026-11-03)
 
@@ -69,7 +70,7 @@
 - [ ] Verify progression charts with two different genuine refresh timestamps from PUBG production
 - [ ] End-to-end production browser, Android and Xbox validation
 
-### Phase 3 — Match intelligence and recorded-coordinate replays
+### Phase 3 — Match intelligence, combat events and opponent analysis
 - [x] Read-only cached PUBG match-intelligence API for saved console players (no public upstream calls)
 - [x] Responsive Match Intelligence website tab with optional squad breakdown
 - [x] Verify match-cache shape in Supabase; use existing Discord /recent to populate
@@ -100,8 +101,8 @@
 
 - [x] Import and attribute seven pinned publisher dictionaries without private player data or another API
 - [x] Add public-safe saved PUBG source explorer for profile, seasons, ranked, mastery, survival and match fields, including typed nested paths and safe JSON download
-- [x] Integrate bounded real match-local combat, event-level rival analysis and 2D sampled-coordinate replay (secure publisher-only telemetry URL, shared web cooldown, persistent derived Supabase cache, no extra API key)
-- [ ] Verify actual telemetry processing and replay on a newly fetched production match
+- [x] Integrate bounded real match-local combat and event-level rival analysis (secure publisher-only telemetry URL, shared web cooldown, persistent derived Supabase cache, no extra API key). The retired 2D replay functionality is not part of the product.
+- [ ] Verify genuine combat-event telemetry processing on a newly fetched production match without 2D replay.
 - [x] Official regional/season leaderboard page with exact API rank/metric fields, saved cache reuse, 90-second shared web cooldown and atomic shared PUBG requests; corrected for the post-Season-7 no-page-filter endpoint
 - [ ] Validate official regional leaderboard live against a genuine returned production response
 - [ ] Complete telemetry source browsing, player activity, sample and tournament resources
@@ -153,7 +154,7 @@ Existing server-side Supabase service role --> saved verified statistics
 Existing Discord /interactions & /api/sync --> shared rate-limited PUBG data collection
 ```
 
-Ordinary website reads use saved Supabase data and never spend PUBG API capacity. Explicit **Refresh from PUBG** requests run through a server-side Vercel function, an additional web cooldown and the same atomic shared PUBG request limit as Discord. Unknown gamertags are checked on Xbox and PSN once; known account IDs and platforms are reused. Recorded-coordinate 2D telemetry replays are supported for verified PUBG match telemetry; video, terrain overlays without accurate alignment and invented movement remain unsupported.
+Ordinary website reads use saved Supabase data and never spend PUBG API capacity. Explicit **Refresh from PUBG** requests run through a server-side Vercel function, an additional web cooldown and the same atomic shared PUBG request limit as Discord. Unknown gamertags are checked on Xbox and PSN once; known account IDs and platforms are reused. PUBG telemetry is used for genuine combat reports, event histories and opponent statistics only. No coordinate maps, positional tracks, video replay or playback is part of the product.
 
 
 ## HELP Clan training toolkit merger (4 November 2026)
@@ -166,7 +167,7 @@ client-side pages under /training/.
 - [x] Confirm original HELP-Clan-PUBG-Toolkit GitHub repository is public and user-owned.
 - [x] Pin its public source to a stable commit without modifying creator-built maths or using additional API keys.
 - [x] Import all 267 training files, including creator source sections, publisher artwork, asset credits, research and original tests, into the namespaced /training/ directory.
-- [x] Add accessible navigation to Training from the Command Centre sidebar and overview and back to player stats/match replays.
+- [x] Add accessible navigation to Training from the Command Centre sidebar and overview and back to player stats/match intelligence.
 - [x] Use static Vercel routing within the existing project, with no increase beyond 12 serverless functions.
 - [x] Verify 198/198 original source tests and the original real-Chrome eight-tool core smoke before applying namespaced navigation.
 - [x] Validate preserved assets, source attribution, redirect/route configuration and 12-function cap.
