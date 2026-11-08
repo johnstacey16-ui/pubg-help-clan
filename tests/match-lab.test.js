@@ -151,6 +151,6 @@ test('declining, mixed and steady form are distinct from improving',()=>{
  assert.equal(recentForm(steady).verdict,'Steady');
  assert.ok(recentForm(steady).metrics.every(m=>m.direction==='same'));
  const mixed=dates.map((m,i)=>({...m,
-  kills:i<10?3:2,damage:i<10?100:200,placement:i<10?1:2}));
+  kills:i<10?3:2,damage:i<10?100:200,placement:i<10?3:6}));
  assert.equal(recentForm(mixed).verdict,'Mixed form');
 });
