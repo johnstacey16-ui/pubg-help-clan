@@ -2,12 +2,18 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const {publicLobbyOpponents,summarizeLobbies,parseFilters,MAX_MATCHES,MAX_NAMES}=require('../lib/web-lobby-opponents');
-const {csvRows,visibleRows,csvCell}=require('../assets/lobby-opponents');
+const {csvRows,visibleRows,csvCell,profileStat,profileCards}=require('../assets/lobby-opponents');
 const ACCOUNT='account.HERO1234567',NOW=Date.parse('2026-11-08T12:00:00Z');
 const A='00336e4b-d659-4497-bfc4-9f6dd705cc71',B='00336e4b-d659-4497-bfc4-9f6dd705cc72';
 function participant(id,name,account,kills,damage,place){
  return{type:'participant',id,attributes:{stats:{name,playerId:account,kills,
-  damageDealt:damage,winPlace:place,DBNOs:0,headshotKills:0,secretAPIKey:'NOT_PUBLIC'}}};
+  damageDealt:damage,winPlace:place,DBNOs:id==='enemy1'?(kills===5?4:2):0,
+  headshotKills:id==='enemy1'?(kills===5?3:1):0,
+  assists:id==='enemy1'?(kills===5?2:null):0,
+  longestKill:id==='enemy1'?(kills===5?122:90):null,
+  timeSurvived:id==='enemy1'&&kills===5?1100:null,
+  vehicleDestroys:id==='enemy1'?0:null,
+  secretAPIKey:'NOT_PUBLIC'}}};
 }
 function roster(id,rank,refs){
  return{type:'roster',id,attributes:{stats:{rank,teamId:99}},
@@ -82,6 +88,12 @@ test('verified saved lobby rosters distinguish real opponents from missing team 
  assert.equal(rival.damage,560);
  assert.equal(rival.damageObserved,2);
  assert.equal(rival.bestPlacement,1);
+ assert.deepEqual(rival.profile.knocks,{total:6,observed:3,max:4});
+ assert.deepEqual(rival.profile.headshots,{total:4,observed:3,max:3});
+ assert.deepEqual(rival.profile.assists,{total:2,observed:2,max:2});
+ assert.deepEqual(rival.profile.longestKillMeters,{total:212,observed:2,max:122});
+ assert.deepEqual(rival.profile.timeSurvivedSeconds,{total:1100,observed:1,max:1100});
+ assert.deepEqual(rival.profile.vehicleDestroys,{total:0,observed:2,max:0});
  assert.ok(!r.opponents.some(x=>x.name==='Ghost'));
  assert.doesNotMatch(JSON.stringify(r),/account\.[A-Za-z0-9]|secretAPIKey|NOT_PUBLIC|telemetry-cdn|PRIVATE|"tracks"|"replay"|"URL"/);
 });
@@ -97,6 +109,9 @@ test('source window, map, mode and sorts never fabricate missing game stats',()=
  assert.equal(absent.matchesIncluded,0);
  assert.deepEqual(absent.opponents,[]);
  assert.equal(summarizeLobbies(records,ACCOUNT,{days:30,sort:'damage'},NOW).opponents[0].name,'Rival');
+ assert.equal(summarizeLobbies(records,ACCOUNT,{days:30,sort:'knocks'},NOW).opponents[0].name,'Rival');
+ assert.equal(summarizeLobbies(records,ACCOUNT,{days:30,sort:'headshots'},NOW).opponents[0].name,'Rival');
+ assert.equal(summarizeLobbies(records,ACCOUNT,{days:30,sort:'assists'},NOW).opponents[0].name,'Rival');
  assert.equal(MAX_MATCHES,75);
  assert.equal(MAX_NAMES,80);
 });
@@ -109,6 +124,10 @@ test('per-opponent drilldown reports genuine full-match totals, not head-to-head
  assert.equal(r.observations[0].opponentKills,5);
  assert.equal(r.observations[0].playerKills,7);
  assert.equal(r.observations[2].opponentDamage,null);
+ assert.equal(r.observations[0].profile.knocks,4);
+ assert.equal(r.observations[0].profile.longestKillMeters,122);
+ assert.equal(r.observations[2].profile.assists,null);
+ assert.equal(r.profile.assists.observed,2);
  assert.doesNotMatch(JSON.stringify(r),/account\.[A-Za-z0-9]|NOT_PUBLIC|telemetry-cdn|secretAPIKey|"replay"/);
 });
 test('invalid name and selectors are rejected before using private database',async()=>{
@@ -146,6 +165,12 @@ test('CSV cells block formulas and browser filtering never expands source groupi
  assert.equal(visibleRows(list,'RIVAL').length,1);
  const csv=csvRows(visibleRows(list,'Rival'));
  assert.match(csv,/Rival/);
+ assert.match(csv,/Knocks observed sum/);
+ assert.match(csv,/Headshots sample count/);
+ assert.match(csv,/"6","3","4"/);
+ assert.equal(profileStat(list.opponents.find(x=>x.name==='Rival').profile,'longestKillMeters'),'122 m best');
+ assert.equal(profileStat(list.opponents.find(x=>x.name==='Rival').profile,'timeSurvivedSeconds'),'18.3 min avg');
+ assert.match(profileCards({knocks:{observed:0,total:0,max:null}}),/n=0 saved observations/);
  assert.doesNotMatch(csv,/Another|account\.|NOT_PUBLIC/);
 });
 test('both integrated routes ship the scouting source, never a replay',()=>{
@@ -157,6 +182,9 @@ test('both integrated routes ship the scouting source, never a replay',()=>{
    'scout-count','scout-table','scout-detail','scout-export'])
    assert.match(html,new RegExp('id="'+id+'"'),p+' missing '+id);
   assert.match(html,/\/assets\/lobby-opponents\.css/);
+  assert.match(html,/<th>KNOCKS<\/th><th>ASSISTS<\/th><th>HEADSHOTS<\/th>/);
+  for(const order of ['knocks','assists','headshots'])
+   assert.match(html,new RegExp('value="'+order+'"'));
  }
  assert.match(read('index.html'),/\/assets\/lobby-opponents\.js/);
  assert.match(read('training/js/clan-dashboard-loader.js'),/\/assets\/lobby-opponents\.js/);
