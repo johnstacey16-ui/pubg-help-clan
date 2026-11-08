@@ -313,6 +313,7 @@
     window.MatchLab?.reset();
     window.MatchLobby?.matchesChanged(name,[]);
     window.LobbyOpponents?.matchesChanged(name,[]);
+    window.PersonalRivalries?.setPlayer(name);
     if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,[]);
     try{
       var response=await fetch('/api/public-matches?name='+encodeURIComponent(name),{

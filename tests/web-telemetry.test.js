@@ -177,6 +177,10 @@ test('cross-match rival trends deduplicate saved report IDs and use no upstream 
  assert.equal(r.body.rivals[0].matchesSampled,2);
  assert.equal(r.body.rivals[0].kills,1);
  assert.equal(r.body.rivals[0].deaths,1);
+ assert.equal(r.body.killLeaders.mostKilled.name,'Opponent');
+ assert.equal(r.body.killLeaders.mostKilled.kills,1);
+ assert.equal(r.body.killLeaders.mostKilledBy.name,'Opponent');
+ assert.equal(r.body.killLeaders.mostKilledBy.deaths,1);
  assert.equal(r.body.rivals[0].damageDealt,60);
  assert.equal(r.body.rivals[0].damageTaken,42);
  assert.equal(db.upstream,0);
