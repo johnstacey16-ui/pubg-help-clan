@@ -84,8 +84,13 @@ const server=http.createServer(async(req,res)=>{
  if(uri.pathname.startsWith('/api/'))return reply(res,200,{
   schemaVersion:1,items:[],matches:[],rows:[],entries:[],error:'No synthetic records'
  });
- const uriPath=(uri.pathname==='/'||uri.pathname==='/dashboard/'||uri.pathname==='/training/')?'/training/index.html':path.posix.normalize(uri.pathname);
- if(uriPath.includes('..')||!(/^\/(?:assets|design|training)\/[\w./-]+$/.test(uriPath)))
+ // Existing suite checks the combined toolkit. Discord direct links target
+ // the *standalone* dashboard, so serve its real entrypoint separately.
+ const uriPath=uri.pathname==='/standalone/'?'/index.html':
+   (uri.pathname==='/'||uri.pathname==='/dashboard/'||uri.pathname==='/training/')
+     ?'/training/index.html':path.posix.normalize(uri.pathname);
+ if(uriPath!=='/index.html'&&(uriPath.includes('..')||
+    !(/^\/(?:assets|design|training)\/[\w./-]+$/.test(uriPath))))
    return reply(res,404,{error:'Invalid asset'});
  try{
   const file=path.join(root,uriPath.substring(1)),bytes=await fs.readFile(file);
@@ -178,14 +183,14 @@ async function run(){
     .textContent.includes('14,000'));
    // Direct Discord links must select the actual saved player and report.
    await page.goto('http://127.0.0.1:'+server.address().port+
-     '/dashboard/#matches/player/Member%2001/form',{waitUntil:'networkidle'});
+     '/standalone/#matches/player/Member%2001/form',{waitUntil:'networkidle'});
    await page.locator('#page-matches').waitFor({state:'visible'});
    assert.equal(await page.locator('#match-player').inputValue(),'Member 01');
    assert.equal(await page.locator('#match-performance-panel').isVisible(),true);
    assert.equal(await page.evaluate(()=>location.hash),
      '#matches/player/Member%2001/form');
    await page.goto('http://127.0.0.1:'+server.address().port+
-     '/dashboard/#matches/player/Member%2001/rivals',{waitUntil:'networkidle'});
+     '/standalone/#matches/player/Member%2001/rivals',{waitUntil:'networkidle'});
    await page.locator('#page-matches').waitFor({state:'visible'});
    assert.equal(await page.locator('#match-player').inputValue(),'Member 01');
    assert.equal(await page.locator('#personal-rivals-panel').isVisible(),true);
