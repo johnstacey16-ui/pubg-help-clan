@@ -1,5 +1,25 @@
 # PUBG Console Clan Discord Bot
 
+## Consolidated project ownership (November 2026)
+
+**This repository is the canonical HELP Clan application.** The full static training
+toolkit, PUBG clan website, verified match archive, and Discord bot are all maintained
+here. The October 2026 HELP Toolkit source snapshot is already copied into
+`training/` (265 of the old source's 266 files; the sole omitted file is its old
+GitHub Actions workflow). The remaining three adapted files are integrated site UI
+and browser-test files; the other 262 copies are identical to the original.
+No runtime, build, or CI step should clone the old toolkit repository.
+Use changes to `training/` here for all further training-tool development.
+
+The older **PUBG-Console-Dashboard** was a separate on-demand
+PUBG API/Upstash Redis application, not this application's Supabase/Discord
+backend. It contains legacy raw-data exports and 2D replay source that
+were not carried forward verbatim. Its repo and optional old Upstash cache
+must be assessed separately before permanent deletion. Do not delete the
+active **PUBG Bot** Supabase project or any deployment serving the Discord
+interactions endpoint and clan website.
+
+
 A Vercel serverless Discord bot using **PUBG API**, **Supabase**, and optional **Groq** AI commentary. It supports **Xbox and PlayStation only** (no PC). Match/season/mastery features are subject to actual PUBG API availability.
 
 ## Web dashboard (initial build)
