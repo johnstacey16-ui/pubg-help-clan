@@ -943,6 +943,7 @@
           !/[,\u0000-\u001f\u007f]/.test(requestedName)){
         matchSharedName=requestedName;
         matchSharedView=matchParts[1];
+        matchName=requestedName;
       }
     }catch(error){}
   }
@@ -966,7 +967,9 @@
         linked=findPlayer(matchSharedName);
       }
       if(linked){
-        chooseMatchPlayer(linked.name);
+        // The initial saved-data reload already populated matching names.
+        // Only switch/reload when lookup added a previously unknown player.
+        if(matchName!==linked.name)chooseMatchPlayer(linked.name);
         var targetId=matchSharedView==='rivals'?'personal-rivals-panel':
           matchSharedView==='scout'?'scout-panel':'match-performance-panel';
         var target=document.getElementById(targetId);
