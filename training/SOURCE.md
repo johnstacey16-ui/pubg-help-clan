@@ -1,18 +1,22 @@
 # Integrated HELP Clan training toolkit
 
-Static namespaced snapshot of the user-owned, public HELP toolkit:
-https://github.com/johnstacey16-ui/HELP-Clan-PUBG-Toolkit
+This directory is now the **maintained, fully local source** of HELP Clan training
+tools. The original user-owned source was imported from
+`johnstacey16-ui/HELP-Clan-PUBG-Toolkit` at commit
+`a836606c896069b342fe9a1dbf3fb05934284342` (28 October 2026).
 
-Pinned source commit: a836606c896069b342fe9a1dbf3fb05934284342
-Source date: 28 October 2026
-Refresh: bash scripts/vendor-help-toolkit.sh
+265 of the original 266 source files were carried into `training/`.
+The omitted original file was only the old GitHub Actions workflow; 262
+imported files were identical at retirement review, and the other three
+were adapted for consolidated navigation or tests.
 
-All original training calculators, source sections, docs, original tests,
-and publisher art credits remain intact. The HTML only gains cross-site
-navigation and a namespaced absolute mannequin asset path. New, isolated
-CSS styles only the navigation bridge. The original source is preserved.
+**Maintenance:** Edit and test `training/` in `pubg-help-clan` directly.
+The historical source clone script and standalone import workflow have been
+retired. No production or test step fetches the former source repository.
 
-No player history, Discord tokens, Supabase keys or private data copied.
-Creator-developed sensitivity and empirical recoil/TTK models remain
-distinguishable from official published PUBG measurements: consult
-DATA_ACCURACY_POLICY.md and VISUAL_ARTWORK_CREDITS.md.
+The original training calculators, source sections, documentation and artwork
+credits are retained. This consolidation did not copy player history,
+Discord credentials, Supabase keys or private data from the former toolkit.
+
+For empirical recoil, TTK and sensitivity models, consult
+`DATA_ACCURACY_POLICY.md` and `VISUAL_ARTWORK_CREDITS.md`.
