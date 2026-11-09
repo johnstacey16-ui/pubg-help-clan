@@ -35,7 +35,7 @@ function fakeDb({row=null,history=null,response=null,error=false}={}){
 }
 test('Discord registry adds restricted subcommands without changing existing commands',()=>{
  assert.equal(commands.length,21);
- assert.match(VERSION,/roster-admin/);
+ assert.match(VERSION,/saved-intel/);
  const cmd=commands.find(x=>x.name==='clanmanage');
  assert.equal(cmd.default_member_permissions,'32');
  assert.deepEqual(cmd.options.map(x=>x.name),['add','remove','status','audit']);
