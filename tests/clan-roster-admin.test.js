@@ -45,7 +45,7 @@ test('Discord registry adds restricted subcommands without changing existing com
   if(sub.name==='audit')assert.equal(sub.options[0].required,false);
   else assert.equal(sub.options[0].required,true);
  }
- assert.equal(new Set(commands.map(c=>c.name)).size,17);
+ assert.equal(new Set(commands.map(c=>c.name)).size,21);
 });
 test('authorization requires signed guild identity and Manage Guild/Administrator, not Manage Channels',()=>{
  assert.equal(admin.canManage(message()),true);
