@@ -7,6 +7,7 @@ const { getStats } = require('../lib/live-stats');
 const { importPendingBatch } = require('../lib/import-batch');
 const core = require('../lib/commands-core');
 const extra = require('../lib/commands-extra');
+const intel = require('../lib/commands-intel');
 const { ensureGuildCommands } = require('../lib/register-commands');
 const squadAnalysis = require('../lib/squad-analysis');
 const channelDashboard = require('../lib/channel-dashboard');
@@ -237,6 +238,10 @@ async function processCommand(body) {
   if (body.data?.name === 'modes') return core.modes(db, body);
   if (body.data?.name === 'compare') return core.compare(db, body);
   if (body.data?.name === 'recent') return extra.recent(db, body);
+  if (body.data?.name === 'form') return intel.form(db, body);
+  if (body.data?.name === 'rivals') return intel.rivals(db, body);
+  if (body.data?.name === 'clanmatches') return intel.clanMatches(db, body);
+  if (body.data?.name === 'intel') return intel.intel(db, body);
   if (body.data?.name === 'match') return extra.match(db, body);
   if (body.data?.name === 'squad') return squadAnalysis.squad(db, body);
   if (body.data?.name === 'teammates') return squadAnalysis.teammates(db, body);
