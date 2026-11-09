@@ -14,6 +14,8 @@ test('Discord names are escaped, not altered as PUBG account identities', () => 
   assert.equal(safeDiscord('Gunny87*'), 'Gunny87\\*');
   assert.equal(safeDiscord('Babaroga-*-'), 'Babaroga-\\*-');
   assert.equal(safeDiscord('SASHA_Get2012'), 'SASHA\\_Get2012');
+  assert.equal(safeDiscord('@everyone'), '@\u200beveryone');
+  assert.equal(safeDiscord('<@123456789012345678>'), '\\<@\u200b123456789012345678\\>');
 });
 test('case insensitive exact player matching ignores other returned names', () => {
   const items = [{ id: 'x', attributes: { name: 'Example_1' } }, { id: 'y', attributes: { name: 'Other' } }];
