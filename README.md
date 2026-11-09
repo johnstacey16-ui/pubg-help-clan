@@ -26,7 +26,7 @@ The two SVGs are original editable design references. Their illustrated numbers 
 
 ### Commands
 
-## Commands (16)
+## Commands (21)
 
 | Discord command | What it does |
 |---|---|
@@ -39,6 +39,10 @@ The two SVGs are original editable design references. Their illustrated numbers 
 | /compare player1 player2 | Compare two Xbox/PSN players using actual saved PUBG statistics |
 | /modes gamertag [mode] | Detailed Solo/Duo/Squad lifetime statistics, including FPP modes |
 | /recent gamertag [count] | Player's recent match IDs, placements, kills, damage and maps |
+| /form gamertag | Two saved 10-game windows, metric changes and honest source coverage |
+| /rivals gamertag [days] | Verified direct-kill rivalries from saved combat reports (no API calls) |
+| /clanmatches [days] | Read-only archived clan results for the last 7, 30 or 180 days |
+| /intel [section] | Open detailed website views including opponent scouting, match history and awards |
 | /match gamertag matchid | Individual match result, player kills, placement, assists and more |
 | /squad gamertag matchid | Squad breakdown for one match: teammates, kills, damage, assists and knocks |
 | /teammates gamertag [count] | Most frequent teammates in the last 1–5 available matches |
@@ -98,6 +102,33 @@ allowlisted timestamps and numeric totals — no internal player IDs, account
 IDs or tracked outsiders. The snapshot table has RLS enabled, no
 `anon`/`authenticated` privileges and an explicit service-role grant, as
 required by the Supabase October 2026 table exposure changes.
+
+## Discord intelligence parity (November 2026)
+
+The existing bot now offers the read-only, cache-only commands
+\`/form gamertag\`, \`/rivals gamertag [days]\` and
+\`/clanmatches [days]\`. They reuse the website's validated stored
+match reports, direct-kill telemetry summaries and verified-clan history
+aggregation. None of these commands performs a fresh PUBG lookup, triggers
+match ingestion or spends the shared PUBG API budget. No new Vercel function
+or database migration is required.
+
+\`/form\` compares the ten newest dated saved games with the preceding ten;
+incomplete data is reported as missing, never as zero. \`/rivals\` includes only
+previously analysed direct kills/deaths and warns that visible opponent names
+do not prove account identities across different games. \`/clanmatches\`
+summarises observed archive matches, not lifetime stats. For longer tables
+and drilling into saved lobby opponents use \`/intel section:scout\` or
+the new **Match intel & scouting** link on the permanent Discord cards.
+\`/recent\` continues to serve short, recent PUBG lookups (subject to the
+existing budget) while rendering friendly battleground names.
+
+**Registration:** The command manifest version has changed; after deploying
+to production the next authenticated signed clan Discord interaction attempts
+to register the new guild slash commands using the existing private bot token.
+A successful website deployment by itself does not verify Discord's command menu.
+The permanent dashboard cards refresh through the existing daily scheduler or
+the existing manual dashboard refresh/setup buttons.
 
 ## Dedicated Discord dashboard channel
 

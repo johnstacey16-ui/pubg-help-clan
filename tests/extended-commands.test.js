@@ -6,12 +6,12 @@ const core = require('../lib/commands-core');
 const extra = require('../lib/commands-extra');
 const { matchEndpoint } = require('../lib/pubg-endpoints');
 
-test('all seventeen Discord commands have unique names and valid required-option order', () => {
-  assert.equal(commands.length, 17);
+test('all twenty-one Discord commands have unique names and valid required-option order', () => {
+  assert.equal(commands.length, 21);
   assert.equal(new Set(commands.map(x => x.name)).size, commands.length);
   const names = new Set(commands.map(x => x.name));
   for (const name of ['stats','leaderboard','roster','clanmanage','help','clan',
-    'compare','modes','recent','match','squad','teammates','mastery','season','ranked','dashboard','setup'])
+    'compare','modes','recent','form','rivals','clanmatches','intel','match','squad','teammates','mastery','season','ranked','dashboard','setup'])
     assert.ok(names.has(name), 'Missing command ' + name);
   for (const cmd of commands) {
     assert.match(cmd.name, /^[a-z]{1,32}$/);
@@ -30,6 +30,10 @@ test('all seventeen Discord commands have unique names and valid required-option
   }
   assert.match(core.help(), /\/recent/);
   assert.match(core.help(), /\/mastery/);
+  assert.match(core.help(), /\/form/);
+  assert.match(core.help(), /\/rivals/);
+  assert.match(core.help(), /\/clanmatches/);
+  assert.match(core.help(), /\/intel/);
 });
 test('game-mode stat output includes only verified supplied statistics', () => {
   const row = core.modeRow('squad', {
@@ -96,4 +100,13 @@ test('weapon parser maps real PUBG LevelCurrent and capitalised OfficialStatsTot
   assert.equal(result[0].official,true);
   assert.equal(result[1].kills,55);
   assert.equal(result[1].official,false);
+});
+
+test('discord detailed match reports translate official battleground IDs',()=>{
+ const result=extra.detailedMatch({
+  id:'synthetic',map:'Baltic_Main',mode:'squad',date:'2026-11-08T12:00:00Z',
+  duration:1800,count:100,s:{winPlace:3,kills:4,damageDealt:450}
+ },'Player One','id-test');
+ assert.match(result,/Erangel/);
+ assert.doesNotMatch(result,/Baltic_Main/);
 });

@@ -34,8 +34,8 @@ function fakeDb({row=null,history=null,response=null,error=false}={}){
  return db;
 }
 test('Discord registry adds restricted subcommands without changing existing commands',()=>{
- assert.equal(commands.length,17);
- assert.match(VERSION,/roster-admin/);
+ assert.equal(commands.length,21);
+ assert.match(VERSION,/saved-intel/);
  const cmd=commands.find(x=>x.name==='clanmanage');
  assert.equal(cmd.default_member_permissions,'32');
  assert.deepEqual(cmd.options.map(x=>x.name),['add','remove','status','audit']);
@@ -45,7 +45,7 @@ test('Discord registry adds restricted subcommands without changing existing com
   if(sub.name==='audit')assert.equal(sub.options[0].required,false);
   else assert.equal(sub.options[0].required,true);
  }
- assert.equal(new Set(commands.map(c=>c.name)).size,17);
+ assert.equal(new Set(commands.map(c=>c.name)).size,21);
 });
 test('authorization requires signed guild identity and Manage Guild/Administrator, not Manage Channels',()=>{
  assert.equal(admin.canManage(message()),true);
@@ -120,6 +120,7 @@ test('audit response is private, bounded and has no raw member ids or tokens',as
  assert.match(reply,/…5678/);
  assert.doesNotMatch(reply,/<@|123456789012345678/);
  assert.match(reply,/@\u200beveryone/);
+ assert.doesNotMatch(reply,/@\u200b\u200beveryone/);
  assert.deepEqual(db.calls.slice(-1),[['limit',5]]);
 });
 test('duplicates, case collisions, absent members and unchanged requests are explicit',()=>{
