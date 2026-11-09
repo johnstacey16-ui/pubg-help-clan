@@ -40,7 +40,7 @@ test('/form reuses exactly the saved 10+10 window and never fetches PUBG',async(
  assert.match(result,/Damage \/ game.*420 vs 100/);
  assert.match(result,/Top-10 finishes/);
  assert.match(result,/saved match archive/i);
- assert.match(result,/\/dashboard\/#matches/);
+ assert.match(result,/\/dashboard\/#matches\/player\/Sample%20Member\/form/);
  assert.ok(result.length<1900);
  assert.deepEqual(db.tables,['players','clan_match_archive'],
   'Discord form must query only existing saved tables');
@@ -100,6 +100,7 @@ test('/rivals reports real directed kill events from stored compact analyses onl
  assert.match(report,/You killed most.*Opponent One.*2 confirmed kill/);
  assert.match(report,/Killed you most.*Opponent Two.*3 confirmed kill/);
  assert.match(report,/previously analysed matches/);
+ assert.match(report,/\/dashboard\/#matches\/player\/Sample%20Member\/rivals/);
  assert.deepEqual(db.tables,['players','pubg_endpoint_cache','pubg_endpoint_cache']);
  assert.ok(report.length<1900);
 });
