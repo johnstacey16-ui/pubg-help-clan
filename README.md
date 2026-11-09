@@ -120,6 +120,9 @@ do not prove account identities across different games. \`/clanmatches\`
 summarises observed archive matches, not lifetime stats. For longer tables
 and drilling into saved lobby opponents use \`/intel section:scout\` or
 the new **Match intel & scouting** link on the permanent Discord cards.
+Individual \`/form\` and \`/rivals\` responses provide encoded deep links
+that open that saved player and the relevant report directly in the website.
+The website only uses cache-only saved player lookups for these links.
 \`/recent\` continues to serve short, recent PUBG lookups (subject to the
 existing budget) while rendering friendly battleground names.
 

@@ -930,7 +930,22 @@
   window.WeaponExplorer?.init();
   window.ClanWeaponBoard?.init();
   var hash=location.hash.slice(1);
-  var sharedName=null,sharedPlatform=null;
+  var sharedName=null,sharedPlatform=null,matchSharedName=null,matchSharedView=null;
+  // Discord /form and /rivals links open an actual saved player and panel.
+  // Use the fragment only; never make the fragment a privileged API input.
+  if(hash.startsWith('matches/player/')){
+    try{
+      var matchParts=hash.slice('matches/player/'.length).split('/');
+      var requestedName=decodeURIComponent(matchParts[0]);
+      if(matchParts.length===2&&
+          ['form','rivals','scout'].includes(matchParts[1])&&
+          requestedName.length>0&&requestedName.length<=100&&
+          !/[,\u0000-\u001f\u007f]/.test(requestedName)){
+        matchSharedName=requestedName;
+        matchSharedView=matchParts[1];
+      }
+    }catch(error){}
+  }
   if(hash.startsWith('player/')){
     try {
       var path=hash.slice(7),slash=path.indexOf('/');
@@ -940,8 +955,27 @@
       } else sharedName=decodeURIComponent(path);
     }catch(error){}
   }
-  go(sharedName?'overview':(['overview','leaderboard','players','modes','full-stats','matches','weapons','season','teammates','compare','awards','analysis','data-tools','help','survival','sources','global','health','roadmap'].includes(hash)?hash:'overview'),Boolean(sharedName));
+  go(sharedName?'overview':matchSharedName?'matches':(['overview','leaderboard','players','modes','full-stats','matches','weapons','season','teammates','compare','awards','analysis','data-tools','help','survival','sources','global','health','roadmap'].includes(hash)?hash:'overview'),Boolean(sharedName||matchSharedName));
   reload().then(async function(){
+    if(matchSharedName){
+      var linked=findPlayer(matchSharedName);
+      // Tracked non-clan players can have saved match history too.
+      // A cache-only lookup adds their verified player to the selector.
+      if(!linked){
+        await lookupAnyPlayer(false,matchSharedName,'auto',false);
+        linked=findPlayer(matchSharedName);
+      }
+      if(linked){
+        chooseMatchPlayer(linked.name);
+        var targetId=matchSharedView==='rivals'?'personal-rivals-panel':
+          matchSharedView==='scout'?'scout-panel':'match-performance-panel';
+        var target=document.getElementById(targetId);
+        if(target)target.scrollIntoView({block:'start'});
+      }else if(data){
+        $('match-note').textContent='The linked player has no saved profile here. Search their PUBG name to view available records.';
+      }
+      return;
+    }
     if(!sharedName)return;
     if(findPlayer(sharedName) && (!sharedPlatform||findPlayer(sharedName).platform===sharedPlatform)){
       openProfile(sharedName,true);
