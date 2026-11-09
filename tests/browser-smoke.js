@@ -176,8 +176,21 @@ async function run(){
 
    await page.waitForFunction(()=>document.getElementById('survival-data')
     .textContent.includes('14,000'));
+   // Direct Discord links must select the actual saved player and report.
+   await page.goto('http://127.0.0.1:'+server.address().port+
+     '/dashboard/#matches/player/Member%2001/form',{waitUntil:'networkidle'});
+   await page.locator('#page-matches').waitFor({state:'visible'});
+   assert.equal(await page.locator('#match-player').inputValue(),'Member 01');
+   assert.equal(await page.locator('#match-performance-panel').isVisible(),true);
+   assert.equal(await page.evaluate(()=>location.hash),
+     '#matches/player/Member%2001/form');
+   await page.goto('http://127.0.0.1:'+server.address().port+
+     '/dashboard/#matches/player/Member%2001/rivals',{waitUntil:'networkidle'});
+   await page.locator('#page-matches').waitFor({state:'visible'});
+   assert.equal(await page.locator('#match-player').inputValue(),'Member 01');
+   assert.equal(await page.locator('#personal-rivals-panel').isVisible(),true);
    assert.deepEqual(errors,[],'Browser console errors at '+width+'px');
-   console.log('CHROME PASS: '+width+'px; 19 tabs, roster pagination, awards, health, dictionary, survival');
+   console.log('CHROME PASS: '+width+'px; 19 tabs, saved player links, roster, awards, health, dictionary, survival');
    await page.close();
   }
   console.log('REAL CHROME SMOKE PASS; only local synthetic API fixtures');
