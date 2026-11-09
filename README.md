@@ -26,7 +26,7 @@ The two SVGs are original editable design references. Their illustrated numbers 
 
 ### Commands
 
-## Commands (16)
+## Commands (21)
 
 | Discord command | What it does |
 |---|---|
@@ -39,6 +39,10 @@ The two SVGs are original editable design references. Their illustrated numbers 
 | /compare player1 player2 | Compare two Xbox/PSN players using actual saved PUBG statistics |
 | /modes gamertag [mode] | Detailed Solo/Duo/Squad lifetime statistics, including FPP modes |
 | /recent gamertag [count] | Player's recent match IDs, placements, kills, damage and maps |
+| /form gamertag | Two saved 10-game windows, metric changes and honest source coverage |
+| /rivals gamertag [days] | Verified direct-kill rivalries from saved combat reports (no API calls) |
+| /clanmatches [days] | Read-only archived clan results for the last 7, 30 or 180 days |
+| /intel [section] | Open detailed website views including opponent scouting, match history and awards |
 | /match gamertag matchid | Individual match result, player kills, placement, assists and more |
 | /squad gamertag matchid | Squad breakdown for one match: teammates, kills, damage, assists and knocks |
 | /teammates gamertag [count] | Most frequent teammates in the last 1–5 available matches |
