@@ -34,7 +34,7 @@ function fakeDb({row=null,history=null,response=null,error=false}={}){
  return db;
 }
 test('Discord registry adds restricted subcommands without changing existing commands',()=>{
- assert.equal(commands.length,17);
+ assert.equal(commands.length,21);
  assert.match(VERSION,/roster-admin/);
  const cmd=commands.find(x=>x.name==='clanmanage');
  assert.equal(cmd.default_member_permissions,'32');
@@ -120,6 +120,7 @@ test('audit response is private, bounded and has no raw member ids or tokens',as
  assert.match(reply,/…5678/);
  assert.doesNotMatch(reply,/<@|123456789012345678/);
  assert.match(reply,/@\u200beveryone/);
+ assert.doesNotMatch(reply,/@\u200b\u200beveryone/);
  assert.deepEqual(db.calls.slice(-1),[['limit',5]]);
 });
 test('duplicates, case collisions, absent members and unchanged requests are explicit',()=>{
