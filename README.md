@@ -96,6 +96,15 @@ Production Vercel environment variables: DISCORD_PUBLIC_KEY, DISCORD_CLIENT_ID, 
 
 Important: the legacy public.players, public.matches and public.clan_records Supabase tables **still have RLS disabled**. Restrict their access using deliberate grants/RLS policies before treating the system as fully secured; avoid enabling RLS blindly without reviewing client access.
 
+## Controlled Vercel releases (10 November 2026)
+
+**PUBG now follows the same deliberate deployment gate as Crown & Kingdoms.**
+Normal pushes to `main` (features, tests, docs, refactors) still run GitHub Actions, but Vercel's `ignoreCommand` runs `node scripts/vercel-deployment-gate.mjs` and **skips the build unless the Git commit message contains a standalone `[deploy]` marker**. Exit code 0 skips, exit code 1 allows a build. The ignored step does not prevent Vercel from *creating* a canceled/skipped deployment record; do not count these as published releases or assume they are free of deployment quota accounting.
+
+To intentionally publish an accepted version: review `main`, confirm `npm test`, `npm run check`, GitHub Actions and browser results, then make **one deliberate release commit** with `[deploy]` in the message (for example `release: verified clan update [deploy]`). Verify Vercel's production build is READY and the production alias serves that commit; check `/api/health`, static toolkit/dashboard routes, and the signed Discord interactions endpoint without leaking secrets. The existing daily `/api/sync` cron and all API routes remain unchanged. Do **not** include `[deploy]` in routine commit messages, including the commit adding this policy.
+
+This gate applies to **Git-triggered Vercel builds**; manual CLI deployments, dashboard redeploys with the Ignore Build Step disabled, and other authorized promotion routes can still publish independently. The old production website keeps running when a new build is skipped. GitHub's existing production-HTTP smoke job checks the currently live website, **not proof** that the newest code was deployed. The gate does not run the test suite itself, so tests and explicit release verification remain mandatory.
+
 ## Validation and roadmap
 
 Run npm test and npm run check. Verify deployments and /api/health, then exercise commands inside Discord.

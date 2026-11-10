@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "ignoreCommand": "node scripts/vercel-deployment-gate.mjs",
   "builds": [
     {
       "src": "api/**/*.js",

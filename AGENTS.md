@@ -25,6 +25,10 @@ These rules apply to the **PUBG HELP Clan website, dashboard, training toolkit, 
 9. **Database access is a security boundary.** Review grants/RLS and private tables before exposing data. Do not silently mark discovered players as official HELP Clan members. Recalculate leaderboard and rivalry results from authentic saved sources. Rate-limit and bound public requests and redact private identifiers.
 10. **Only report real evidence.** Separate official observed PUBG stats, cached/old stats, incomplete sample sizes and the training toolkit's empirical calculators. Do not invent kills, damage, rankings, match positions, timestamps or confidence. No 2D replay, position-track or map-playback features: the owner explicitly excluded them in [ROADMAP.md](ROADMAP.md).
 
+## Controlled publishing on Vercel
+
+GitHub `main` development commits are **not** automatic live releases: `vercel.json` uses `scripts/vercel-deployment-gate.mjs` to skip builds unless a commit message has an explicit standalone `[deploy]` marker. Never add this marker to routine docs/code/test commits. The owner authorizes ongoing game/tool development, **not automatic production publication**. Before a release, verify `npm test`, `npm run check`, relevant GitHub/Chrome checks, and free-tier hosting limits; intentionally publish with one `[deploy]` release commit, then verify Vercel READY, production revision, website/API and Discord behavior. The gate only controls Git-triggered builds and doesn't stop authorized manual deployments. [README instructions](README.md#controlled-vercel-releases-10-november-2026).
+
 ## Test, hosting and delivery
 
 11. Run `npm test` and `npm run check` for application changes, with focused security/API/browser tests when relevant. Test malformed input, unauthenticated calls, duplicate requests, rate limits, data privacy, frontend compatibility and expected user flows.
