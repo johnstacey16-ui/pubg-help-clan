@@ -1,5 +1,7 @@
 # PUBG Console Clan Discord Bot
 
+**Developer rules:** [AGENTS.md](AGENTS.md) defines modular source organization, the new-code 300-line readability target, reuse-first changes, trusted-side validation, rate-budget preservation, and release/testing boundaries. These rules apply to the bot, dashboard and training toolkit without requiring a bulk rewrite.
+
 ## Consolidated project ownership (November 2026)
 
 **This repository is the canonical HELP Clan application.** The full static training

@@ -5,6 +5,7 @@
 **Services:** existing Vercel Hobby, Supabase, official PUBG console API, Discord bot  
 **Permanent exclusion (owner decision, 2026-11-08):** Never build, enable or reintroduce 2D replay visualizations, position tracks, map playback or replay controls. Maintain existing combat, squad, match and rival statistics without spatial replay data. This supersedes earlier replay requests.  
 **Rules:** free hosting where possible; never expose credentials; Xbox & PlayStation only; 2D replays, position maps, animated tracks and playback are permanently excluded by the project owner; genuine non-spatial match/telemetry statistics are permitted; complete checks only when tests pass.
+**Code and security workflow:** follow [AGENTS.md](AGENTS.md): reuse existing modules, aim for one responsibility and around 300 lines for *new* files, retain the existing API/lib/assets/training/Supabase boundaries, validate all untrusted client values in authoritative handlers, and protect Discord signatures, RLS, secrets and shared PUBG request budgets. Refactor oversized files incrementally instead of delaying feature delivery.
 
 ## Completed in the initial web-app foundation (2026-11-03)
 
