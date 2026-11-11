@@ -110,7 +110,9 @@
     {
       "src": "/dashboard",
       "status": 308,
-      "headers": {"Location": "/dashboard/"}
+      "headers": {
+        "Location": "/dashboard/"
+      }
     },
     {
       "src": "/dashboard/",
@@ -123,7 +125,9 @@
     {
       "src": "/index.html",
       "status": 308,
-      "headers": {"Location": "/dashboard/"}
+      "headers": {
+        "Location": "/dashboard/"
+      }
     }
   ],
   "crons": [
@@ -131,5 +135,10 @@
       "path": "/api/sync",
       "schedule": "0 5 * * *"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "development": false
+    }
+  }
 }

@@ -72,3 +72,18 @@ test('unknown commit metadata fails closed',()=>{
     assert.match(result.stderr,/skip Vercel build safely/);
   }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+test('routine development commits keep Vercel preview creation off and GitHub checks on',()=>{
+  assert.equal(config.git?.deploymentEnabled?.development,false,
+    'Vercel must not create deployment records for normal development pushes');
+  assert.notEqual(config.git?.deploymentEnabled?.main,false,
+    'intentional [deploy] production releases must remain possible');
+  const ci=readFileSync(join(root,'.github','workflows','verify.yml'),'utf8');
+  assert.match(ci,/push:\s*\n\s*branches: \[main, development\]/);
+  assert.match(ci,/pull_request:/,'release pull requests remain verified');
+  assert.match(ci,/github\.ref == 'refs\/heads\/main' && contains\(github\.event\.head_commit\.message, '\[deploy\]'\)/,
+    'production HTTP smoke must not consume traffic on non-release pushes');
+  const backfill=readFileSync(join(root,'.github','workflows','pubg-data-backfill.yml'),'utf8');
+  assert.match(backfill,/if: github\.ref == 'refs\/heads\/main'/,
+    'scheduled authenticated PUBG collection stays restricted to main');
+});

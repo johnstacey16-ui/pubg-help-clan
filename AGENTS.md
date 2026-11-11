@@ -2,6 +2,8 @@
 
 These rules apply to the **PUBG HELP Clan website, dashboard, training toolkit, Vercel API and Discord bot** in this repository. Read [README.md](README.md) and [ROADMAP.md](ROADMAP.md) before changing anything. This is the **canonical application**; do not resurrect the older dashboard or clone the retired training-toolkit repository.
 
+**Working branch:** `development` for all routine code, test, data-model and documentation changes. `main` stays the GitHub default and intended Vercel Production branch; update it only with accepted release changes or a reviewed urgent fix. GitHub file tools read the default `main` unless `ref: 'development'` is explicitly provided. Use non-force, expected-head commits to `development` and never treat its CI green status as proof a version is live.
+
 ## Find and reuse code first
 
 1. **Search before writing.** Check existing code, tests, database migrations, shared helpers, source dictionaries and UI before adding a feature. Fix or extend its existing owner. Avoid duplicated PUBG lookups, rate limiters, match parsers, caching or statistics calculations.
@@ -27,7 +29,7 @@ These rules apply to the **PUBG HELP Clan website, dashboard, training toolkit, 
 
 ## Controlled publishing on Vercel
 
-GitHub `main` development commits are **not** automatic live releases: `vercel.json` uses `scripts/vercel-deployment-gate.mjs` to skip builds unless a commit message has an explicit standalone `[deploy]` marker. Never add this marker to routine docs/code/test commits. The owner authorizes ongoing game/tool development, **not automatic production publication**. Before a release, verify `npm test`, `npm run check`, relevant GitHub/Chrome checks, and free-tier hosting limits; intentionally publish with one `[deploy]` release commit, then verify Vercel READY, production revision, website/API and Discord behavior. The gate only controls Git-triggered builds and doesn't stop authorized manual deployments. [README instructions](README.md#controlled-vercel-releases-10-november-2026).
+Daily development commits belong on `development`. The `vercel.json` rule `git.deploymentEnabled.development=false` disables *automatic preview deployment creation* for that branch while GitHub Actions still runs both Node and Chromium tests. GitHub `main` is the intended production branch; the existing `scripts/vercel-deployment-gate.mjs` skips non-release builds unless the latest release commit contains the standalone `[deploy]` marker. Ignored `main` builds may still count against Vercel quotas, so do not routinely merge to main. Before a release, verify `npm test`, `npm run check`, GitHub/Chrome checks, the unchanged OIDC PUBG backfill/cron rules and free-tier limits, then merge the tested `development` tree into `main` with one intentional `[deploy]` commit when practical. Confirm Vercel READY, live revision, website/API and Discord behaviour; hold release if checks or hosting block it. The gates apply only to Git-triggered builds, not authorized manual deployments. [Release instructions](README.md#controlled-vercel-releases-10-november-2026).
 
 ## Test, hosting and delivery
 

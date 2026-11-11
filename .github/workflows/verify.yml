@@ -2,7 +2,7 @@ name: Verify PUBG bot
 
 on:
   push:
-    branches: [main]
+    branches: [main, development]
   pull_request:
 
 permissions:
@@ -43,7 +43,7 @@ jobs:
         run: node training/tests/hit-zone-preview-smoke.cjs
 
   production-static-smoke:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[deploy]')
     needs: chromium-smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 5
