@@ -55,6 +55,9 @@ test('collects three verified players with one index request per shard',()=>with
  assert.ok(calls.every(x=>x.force));
  assert.ok(indexes.every(x=>x.force));
  assert.ok(db.outcomes.every(x=>x.last_result==='saved'));
+ const nextDelay=db.outcomes.map(x=>Date.parse(x.next_attempt_at)-Date.now());
+ assert.ok(nextDelay.every(ms=>ms>11.9*3600*1000 && ms<12.1*3600*1000),
+   'successful players should be due on the next twice-daily backfill');
 }));
 test('atomic limit refusal stops before claiming another member',()=>withKey(async()=>{
  const db=fakeDb([player(),player(12)]);
