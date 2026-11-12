@@ -69,15 +69,18 @@ test('atomic limit refusal stops before claiming another member',()=>withKey(asy
  assert.ok(Date.parse(db.outcomes[0].next_attempt_at)-Date.now() < 90*1000);
  assert.ok(Date.parse(db.outcomes[0].next_attempt_at)>Date.now());
 }));
-test('stale cached stats are never counted as a new observation',()=>withKey(async()=>{
+test('a stale current-season index never triggers player requests',()=>withKey(async()=>{
  const db=fakeDb([player()]);
+ let playerCalls=0;
  const status=await collectClanSeasons(db,{
   cachedEndpoint:async()=>({state:'stale',data:season}),
-  playerEndpoint:async()=>({state:'stale',data:{data:{}}})
+  playerEndpoint:async()=>{playerCalls++;return{state:'stale',data:{data:{}}};}
  });
  assert.equal(status.seasonSaved,0);
  assert.equal(status.rankedSaved,0);
  assert.equal(status.unavailable,1);
+ assert.equal(playerCalls,0);
+ assert.equal(db.outcomes[0].last_result,'season_index_unavailable');
 }));
 test('missing API key avoids all database claims',async()=>{
  const db=fakeDb([player()]),old=process.env.PUBG_API_KEY;
