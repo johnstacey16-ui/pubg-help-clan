@@ -39,6 +39,24 @@ test('GitHub workflow obtains OIDC identity and starts the backfill API request'
   }
  }
 });
+test('runner fails on a legacy production response without season collection',async()=>{
+ const oldFetch=global.fetch;
+ const oldSecret=process.env.PUBG_SYNC_CRON_SECRET;
+ const oldCycles=process.env.PUBG_BACKFILL_CYCLES;
+ try{
+  process.env.PUBG_SYNC_CRON_SECRET='test-only-secret';
+  process.env.PUBG_BACKFILL_CYCLES='1';
+  global.fetch=async()=>({ok:true,json:async()=>({status:'no_work',
+   extras:{claimed:0}})});
+  await assert.rejects(()=>main(),/missing season collection status/);
+ }finally{
+  global.fetch=oldFetch;
+  if(oldSecret===undefined)delete process.env.PUBG_SYNC_CRON_SECRET;
+  else process.env.PUBG_SYNC_CRON_SECRET=oldSecret;
+  if(oldCycles===undefined)delete process.env.PUBG_BACKFILL_CYCLES;
+  else process.env.PUBG_BACKFILL_CYCLES=oldCycles;
+ }
+});
 test('runner never shadows the JavaScript URL constructor',()=>{
  const fs=require('node:fs');
  const path=require('node:path');

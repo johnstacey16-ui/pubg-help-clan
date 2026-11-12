@@ -35,7 +35,10 @@ async function main(){
    if(!response.ok)throw Error('Authenticated backfill endpoint returned HTTP '+response.status+
       '; make sure the updated GitHub commit is deployed before running this job.');
    const result=await response.json();
-   const progress=result.extras||{},season=result.seasonCollection||{},
+   if(!result?.seasonCollection ||
+      !Number.isInteger(result.seasonCollection.playersAttempted))
+     throw Error('Production sync response is missing season collection status; check the deployed API.');
+   const progress=result.extras||{},season=result.seasonCollection,
     rivalry=result.rivalryCollection||{};
    console.log(JSON.stringify({cycle:i+1,import:result.status,identified:result.identified,
      matched:result.matched,backfillDone:progress.done,backfillTotal:progress.total,
