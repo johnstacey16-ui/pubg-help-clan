@@ -3,9 +3,9 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const {publicSource,safeSource}=require('../lib/web-source');
 const person={gamertag:'ConsolePlayer',platform:'xbox',pubg_account_id:'account.public1234'};
-function db(cache){
+function db(cache,players=[person]){
  return{from(table){
-  if(table==='players')return{select(){return this;},ilike(){return this;},limit:async()=>({data:[person],error:null})};
+  if(table==='players')return{select(){return this;},ilike(){return this;},limit:async()=>({data:players,error:null})};
   assert.equal(table,'pubg_endpoint_cache');
   return{select(){return this;},eq(key,value){this.key=value;return this;},
    async maybeSingle(){return{data:cache[this.key]||null,error:null}}};
@@ -16,6 +16,21 @@ test('source strips identifiers and publisher telemetry addresses, retains null 
   participants:[{playerId:'account.secret',kills:0,url:'https://telemetry-cdn.pubg.com/anything'}]});
  assert.deepEqual(out,{score:0,missing:null,participants:[{kills:0}]});
 });
+test('mixed-case URLs and account fields cannot escape public source redaction',()=>{
+ const source=JSON.parse(JSON.stringify({
+  kills:0,account_ID:'account.PRIVATE',playerID:'player.PRIVATE',
+  telemetryURL:'https://telemetry-cdn.pubg.com/private',
+  nested:{damage:0,signedUrl:'https://private.example/test',
+   x_api_token:'TOKEN_PRIVATE',teamId:7}
+ }));
+ const malicious=JSON.parse('{"__proto__":{"trusted":true},"constructor":{"value":"SECRET"}}');
+ Object.assign(source,malicious);
+ const cleaned=safeSource(source);
+ assert.deepEqual(cleaned,{kills:0,nested:{damage:0,teamId:7}});
+ assert.equal(Object.getPrototypeOf(cleaned),Object.prototype);
+ assert.doesNotMatch(JSON.stringify(cleaned),/PRIVATE|SECRET|private\.example/);
+});
+
 test('actual saved weapon mastery can be explored without upstream requests',async()=>{
  const cache={'pubg:v1:xbox/players/account.public1234/weapon_mastery':{
   fetched_at:'2026-11-03T13:00:00Z',
@@ -41,6 +56,23 @@ test('saved match source requires this exact player among actual participants',a
  assert.equal(good.body.payload.participants[0].stats.kills,12);
  assert.doesNotMatch(JSON.stringify(good.body),/account.public1234/);
 });
+test('source explorer requires a console for duplicate saved names',async()=>{
+ const psn={...person,platform:'psn',pubg_account_id:'account.psn1234567'};
+ const cache={'pubg:v1:psn/players/account.psn1234567/weapon_mastery':{
+  fetched_at:'2026-11-04T13:00:00Z',payload:{data:{attributes:{sourcePlatform:'psn'}}}
+ }};
+ const database=db(cache,[person,psn]);
+ const ambiguous=await publicSource(database,{name:'ConsolePlayer',kind:'weapons'});
+ assert.equal(ambiguous.status,409);
+ assert.equal(ambiguous.body.code,'platform_ambiguous');
+ assert.deepEqual(ambiguous.body.choices,['xbox','psn']);
+ assert.doesNotMatch(JSON.stringify(ambiguous.body),/account\.psn1234567/);
+ const selected=await publicSource(database,{name:'ConsolePlayer',kind:'weapons',platform:'psn'});
+ assert.equal(selected.status,200);
+ assert.equal(selected.body.platform,'psn');
+ assert.equal(selected.body.payload.sourcePlatform,'psn');
+});
+
 test('invalid selectors cannot query the database',async()=>{
  const bad=await publicSource({from(){throw Error('should not query')}},{name:'x',kind:'match',match:'bad'});
  assert.equal(bad.status,400);

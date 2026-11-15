@@ -2,10 +2,10 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {publicPlayer,validInput}=require('../lib/web-player');
 const {processLookup,sameOrigin}=require('../api/player-lookup');
-function db({existing=true,platform='xbox',clan=false}={}){
+function db({existing=true,platform='xbox',clan=false,playerRows=null}={}){
  const calls=[],source={
-  players:existing?[{id:12,gamertag:'Outsider',platform,
-    total_kills:120,total_wins:7,matches_played:55,last_checked:'2026-01-01T00:00:00Z'}]:[],
+  players:playerRows??(existing?[{id:12,gamertag:'Outsider',platform,
+    total_kills:120,total_wins:7,matches_played:55,last_checked:'2026-01-01T00:00:00Z'}]:[]),
   player_lifetime_details:{game_mode_stats:{solo:{kills:120,wins:7,roundsPlayed:55,headshotKills:60}}},
   player_import_queue:[{gamertag:'Outsider',status:'matched',platform,is_clan_member:clan}]
  };
@@ -34,6 +34,35 @@ test('same gamertag across consoles never overwrites another account',async()=>{
  assert.equal(r.status,409);
  assert.match(r.body.error,/already saved on/);
 });
+test('auto-selection rejects two saved console accounts without spending the refresh budget',async()=>{
+ const same={gamertag:'Outsider',total_wins:2,matches_played:10,last_checked:'2026-01-01T00:00:00Z'};
+ const database=db({playerRows:[
+   {...same,id:12,platform:'xbox',total_kills:40},
+   {...same,id:13,platform:'psn',total_kills:90}
+ ]});
+ const auto=await processLookup(database,{name:'Outsider',platform:'auto',refresh:true});
+ assert.equal(auto.status,409);
+ assert.equal(auto.body.code,'platform_ambiguous');
+ assert.deepEqual(auto.body.choices,['xbox','psn']);
+ assert.deepEqual(database.calls,['players']);
+ const selected=await publicPlayer(database,'Outsider','psn');
+ assert.equal(selected.status,200);
+ assert.equal(selected.body.platform,'psn');
+ assert.equal(selected.body.player.kills,90);
+});
+
+test('recent refresh message reflects the actual two-minute cache guard',async()=>{
+ const database=db({playerRows:[{
+   id:12,gamertag:'Outsider',platform:'xbox',
+   total_kills:12,total_wins:1,matches_played:3,last_checked:new Date().toISOString()
+ }]});
+ const result=await processLookup(database,{name:'Outsider',platform:'auto',refresh:true});
+ assert.equal(result.status,200);
+ assert.equal(result.body.refreshState,'recent');
+ assert.match(result.body.note,/2 minutes/);
+ assert.equal(database.calls.includes('reserve_web_refresh'),false);
+});
+
 test('refresh requests are separately throttled before PUBG API access',async()=>{
  const f=db(),r=await processLookup(f,{name:'Outsider',platform:'xbox',refresh:true});
  assert.equal(r.status,429);
