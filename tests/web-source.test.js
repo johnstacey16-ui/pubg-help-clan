@@ -16,6 +16,21 @@ test('source strips identifiers and publisher telemetry addresses, retains null 
   participants:[{playerId:'account.secret',kills:0,url:'https://telemetry-cdn.pubg.com/anything'}]});
  assert.deepEqual(out,{score:0,missing:null,participants:[{kills:0}]});
 });
+test('mixed-case URLs and account fields cannot escape public source redaction',()=>{
+ const source=JSON.parse(JSON.stringify({
+  kills:0,account_ID:'account.PRIVATE',playerID:'player.PRIVATE',
+  telemetryURL:'https://telemetry-cdn.pubg.com/private',
+  nested:{damage:0,signedUrl:'https://private.example/test',
+   x_api_token:'TOKEN_PRIVATE',teamId:7}
+ }));
+ const malicious=JSON.parse('{"__proto__":{"trusted":true},"constructor":{"value":"SECRET"}}');
+ Object.assign(source,malicious);
+ const cleaned=safeSource(source);
+ assert.deepEqual(cleaned,{kills:0,nested:{damage:0,teamId:7}});
+ assert.equal(Object.getPrototypeOf(cleaned),Object.prototype);
+ assert.doesNotMatch(JSON.stringify(cleaned),/PRIVATE|SECRET|private\.example/);
+});
+
 test('actual saved weapon mastery can be explored without upstream requests',async()=>{
  const cache={'pubg:v1:xbox/players/account.public1234/weapon_mastery':{
   fetched_at:'2026-11-03T13:00:00Z',
