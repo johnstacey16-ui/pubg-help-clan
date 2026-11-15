@@ -1,4 +1,4 @@
-name: Prune proven merged branches
+name: Prune safely integrated branches
 
 on:
   push:
@@ -80,12 +80,27 @@ jobs:
             const merged = prs.find(p => p.merged_at && p.merge_commit_sha &&
               p.head?.repo?.full_name === repository && p.head.ref === name &&
               p.head.sha === branch.commit.sha && ['main', 'development'].includes(p.base.ref));
-            if (!merged) { skipped.push(name + ': no exact merged PR head'); continue; }
             try {
-              const comparison = await request('GET', '/compare/' +
-                encodeURIComponent(merged.merge_commit_sha) + '...' + encodeURIComponent(merged.base.ref));
-              if (!['ahead', 'identical'].includes(comparison.status)) {
-                skipped.push(name + ': merge commit not in ' + merged.base.ref); continue;
+              let evidence = '';
+              if (merged) {
+                const comparison = await request('GET', '/compare/' +
+                  encodeURIComponent(merged.merge_commit_sha) + '...' + encodeURIComponent(merged.base.ref));
+                if (!['ahead', 'identical'].includes(comparison.status)) {
+                  skipped.push(name + ': PR merge commit not in ' + merged.base.ref); continue;
+                }
+                evidence = 'merged PR #' + merged.number;
+              } else {
+                for (const target of ['main', 'development']) {
+                  const comparison = await request('GET', '/compare/' +
+                    encodeURIComponent(branch.commit.sha) + '...' + target);
+                  if (['ahead', 'identical'].includes(comparison.status)) {
+                    evidence = 'ancestor of ' + target;
+                    break;
+                  }
+                }
+                if (!evidence) {
+                  skipped.push(name + ': branch contains unique unmerged commits'); continue;
+                }
               }
               const refPath = '/git/refs/heads/' + name.split('/').map(encodeURIComponent).join('/');
               const current = await request('GET', refPath.replace('/refs/', '/ref/'));
@@ -94,7 +109,7 @@ jobs:
               }
               if (apply) await request('DELETE', refPath);
               deleted.push(name);
-              console.log((apply ? 'DELETED ' : 'WOULD DELETE ') + name + ' (merged PR #' + merged.number + ')');
+              console.log((apply ? 'DELETED ' : 'WOULD DELETE ') + name + ' (' + evidence + ')');
             } catch (error) {
               skipped.push(name + ': ' + String(error.message).slice(0, 120));
             }
