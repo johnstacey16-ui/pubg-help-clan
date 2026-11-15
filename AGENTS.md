@@ -4,6 +4,12 @@ These rules apply to the **PUBG HELP Clan website, dashboard, training toolkit, 
 
 **Working branch:** `development` for all routine code, test, data-model and documentation changes. `main` stays the GitHub default and intended Vercel Production branch; update it only with accepted release changes or a reviewed urgent fix. GitHub file tools read the default `main` unless `ref: 'development'` is explicitly provided. Use non-force, expected-head commits to `development` and never treat its CI green status as proof a version is live.
 
+## Branch workflow and cleanup (15 November 2026)
+
+Keep `main` (default branch and live Vercel/Discord/API release history) and `development` (normal code, Supabase migrations and CI) as the only permanent branches. Use temporary `feat/<topic>`, `fix/<topic>`, `test/<topic>`, `refactor/<topic>` or `docs/<topic>` branches **from the latest `development`** for substantial or concurrent work; minor safe fixes may go directly to `development` with non-force expected-head updates. Open PRs against `development`, verify the relevant CI, merge accepted changes, then delete their head branches. Never automatically merge historical feature branches or discard unknown/unmerged work.
+
+Use a `hotfix/<topic>` branch from `main` only for reviewed production emergencies and bring the fix back into `development`. Continue the existing `[deploy]` production-release gate and never trigger paid resources, uncontrolled previews or PUBG backfills by branch cleanup. The [branch-hygiene workflow](.github/workflows/branch-hygiene.yml) may delete only matching exact heads of **merged** PRs whose merge commit is reachable from `main`/`development`, and not protected or open-PR branches. Full match history, audit and deployment evidence remain in Git history.
+
 ## Find and reuse code first
 
 1. **Search before writing.** Check existing code, tests, database migrations, shared helpers, source dictionaries and UI before adding a feature. Fix or extend its existing owner. Avoid duplicated PUBG lookups, rate limiters, match parsers, caching or statistics calculations.
