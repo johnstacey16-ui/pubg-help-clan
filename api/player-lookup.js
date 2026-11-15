@@ -24,7 +24,7 @@ async function processLookup(db,{name,platform='auto',refresh=false}){
  if(stamp && Number.isFinite(Date.parse(stamp))&&
    Date.now()-Date.parse(stamp)<REFRESH_FRESH_MS)
    return{status:200,body:{...saved.body,refreshState:'recent',
-     note:'These PUBG statistics were updated within the last 15 minutes.'}};
+     note:'These PUBG statistics were updated within the last 2 minutes.'}};
  // Once saved, use the confirmed console in both refresh cooldown and PUBG calls.
  // Unknown names use auto once, checking Xbox and PSN within the shared API budget.
  const resolvedPlatform=saved.body.found?saved.body.platform:platform;
