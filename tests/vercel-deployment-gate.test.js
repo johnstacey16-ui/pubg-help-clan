@@ -74,9 +74,9 @@ test('unknown commit metadata fails closed',()=>{
 });
 
 test('routine development commits keep Vercel preview creation off and GitHub checks on',()=>{
-  assert.equal(config.git?.deploymentEnabled?.development,false,
-    'Vercel must not create deployment records for normal development pushes');
-  assert.notEqual(config.git?.deploymentEnabled?.main,false,
+  assert.equal(config.git?.deploymentEnabled?.['**'],false,
+    'Vercel must not create deployment records for any non-production branch');
+  assert.equal(config.git?.deploymentEnabled?.main,true,
     'intentional [deploy] production releases must remain possible');
   const ci=readFileSync(join(root,'.github','workflows','verify.yml'),'utf8');
   assert.match(ci,/push:\s*\n\s*branches: \[main, development\]/);
