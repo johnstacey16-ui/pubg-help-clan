@@ -6,6 +6,10 @@ These rules apply to the **PUBG HELP Clan website, dashboard, training toolkit, 
 
 ## Branch workflow and cleanup (15 November 2026)
 
+**Release-branch safety (15 November deployment lesson):** GitHub auto-deletes merged PR head branches in this repository. Never use the permanent `development` branch as the head of a PR into `main` — GitHub can delete it. Create a short-lived `release/YYYY-MM-DD` branch at the verified `development` commit, PR that branch to `main`, require current-SHA checks, and merge with `[deploy]` only on accepted releases. After the deployment, fast-forward `development` to the resulting production merge commit and allow GitHub to delete only the temporary release branch. Do not force-push, auto-release, or disable the existing free-tier guard.
+
+
+
 Keep `main` (default branch and live Vercel/Discord/API release history) and `development` (normal code, Supabase migrations and CI) as the only permanent branches. Use temporary `feat/<topic>`, `fix/<topic>`, `test/<topic>`, `refactor/<topic>` or `docs/<topic>` branches **from the latest `development`** for substantial or concurrent work; minor safe fixes may go directly to `development` with non-force expected-head updates. Open PRs against `development`, verify the relevant CI, merge accepted changes, then delete their head branches. Never automatically merge historical feature branches or discard unknown/unmerged work.
 
 Use a `hotfix/<topic>` branch from `main` only for reviewed production emergencies and bring the fix back into `development`. Continue the existing `[deploy]` production-release gate and never trigger paid resources, uncontrolled previews or PUBG backfills by branch cleanup. The [branch-hygiene workflow](.github/workflows/branch-hygiene.yml) may delete exact merged-PR heads or branch tips proven ancestors of `main`/`development`, never protected or open-PR branches. Full match history, audit and deployment evidence remain in Git history.
