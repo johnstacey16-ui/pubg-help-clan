@@ -43,6 +43,9 @@
  const GROUPS=['Combat','Survival','Movement','Equipment','Recent activity','Other'];
  const byKey=Object.fromEntries(FIELDS.map(f=>[f.key,f]));
  let players=[],selected=null,ready=false;
+ // Display names can collide across consoles. No PUBG account IDs reach the DOM.
+ const optionValue=(p,list)=>list.some(x=>x!==p&&x.name.toLowerCase()===p.name.toLowerCase())
+  ?JSON.stringify([p.platform,p.name]):p.name;
  const el=id=>document.getElementById(id);
  const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function numeric(x){
@@ -78,7 +81,7 @@
  function modeName(m){return m.replace('-fpp',' FPP').toUpperCase()+(m.includes('fpp')?'':' TPP');}
  function render(){
   if(!ready)return;
-  const p=players.find(x=>x.name===selected),mode=el('full-mode').value,
+  const p=players.find(x=>optionValue(x,players)===selected),mode=el('full-mode').value,
    category=el('full-category').value,query=el('full-query').value.trim().toLowerCase();
   if(!p){
    el('full-source').textContent='No saved player available. Load the clan roster or search a player first.';
@@ -124,16 +127,23 @@
  function setPlayers(list){
   players=Array.isArray(list)?list.filter(p=>p&&typeof p.name==='string'&&
    ['xbox','psn'].includes(p.platform)):[];
-  if(!players.some(p=>p.name===selected))selected=players[0]?.name||null;
+  if(!players.some(p=>optionValue(p,players)===selected))
+   selected=players[0]?optionValue(players[0],players):null;
   if(ready){
-   el('full-player').innerHTML=players.map(p=>'<option value="'+escape(p.name)+'"'+
-    (p.name===selected?' selected':'')+'>'+escape(p.name)+' · '+
+   el('full-player').innerHTML=players.map(p=>'<option value="'+escape(optionValue(p,players))+'"'+
+    (optionValue(p,players)===selected?' selected':'')+'>'+escape(p.name)+' · '+
     (p.platform==='xbox'?'Xbox':'PlayStation')+'</option>').join('');
+   el('full-player').value=selected||'';
    el('full-player').disabled=!players.length;render();
   }
  }
- function select(name){
-  if(players.some(p=>p.name===name))selected=name;
+ function select(name,platform='auto'){
+  const direct=players.filter(p=>optionValue(p,players)===name&&
+   (platform==='auto'||p.platform===platform));
+  const matches=players.filter(p=>p.name===name&&
+   (platform==='auto'||p.platform===platform));
+  const chosen=direct.length===1?direct[0]:matches.length===1?matches[0]:null;
+  if(chosen)selected=optionValue(chosen,players);
   if(ready){el('full-player').value=selected||'';render();}
  }
  function init(){
