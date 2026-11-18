@@ -721,7 +721,9 @@
     if(!element)return;
     element.textContent='Loading actual saved PUBG snapshots…';
     try {
-      var response=await fetch('/api/player-history?name='+encodeURIComponent(name),{headers:{Accept:'application/json'}});
+      var response=await fetch('/api/player-history?name='+encodeURIComponent(name)+
+        '&platform='+encodeURIComponent(window.PubgSelectedPlatform(name)),
+        {headers:{Accept:'application/json'}});
       if(!response.ok)throw Error('History API returned HTTP '+response.status);
       var result=await response.json();
       if(id!==profileRequest || $('profile-name').textContent!==name)return;

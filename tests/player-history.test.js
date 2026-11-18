@@ -69,3 +69,33 @@ test('read-only history never returns private PUBG IDs',async()=>{
  const r=await playerHistory(db,'Xbox_Test');
  assert.doesNotMatch(JSON.stringify(r.data),/account\.PRIVATE|pubg_account_id|player_id/);
 });
+
+test('same visible gamertag requires console for lifetime snapshot history',async()=>{
+ const db=makeDb();
+ const previous=db.from.bind(db);
+ db.from=function(table){
+   const q=previous(table);
+   if(table==='players')q.limit=async()=>({data:[
+     {id:11,gamertag:'Xbox_Test',platform:'xbox',pubg_account_id:'account.PRIVATE'},
+     {id:12,gamertag:'Xbox_Test',platform:'psn',pubg_account_id:'account.PSNPLAYER'}
+   ],error:null});
+   return q;
+ };
+ const ambiguous=await playerHistory(db,'Xbox_Test');
+ assert.equal(ambiguous.status,409);
+ assert.equal(ambiguous.data.code,'platform_ambiguous');
+ assert.deepEqual(ambiguous.data.choices,['xbox','psn']);
+ assert.deepEqual(db.calls,['players']);
+ const selected=await playerHistory(db,'Xbox_Test','psn');
+ assert.equal(selected.status,200);
+ assert.equal(selected.data.platform,'psn');
+ assert.deepEqual(db.calls,['players','players','player_stat_snapshots']);
+ assert.doesNotMatch(JSON.stringify(selected.data),/account\.PSNPLAYER|pubg_account_id|player_id/);
+});
+
+test('invalid history platform fails before any saved account query',async()=>{
+ const db=makeDb();
+ const result=await playerHistory(db,'Xbox_Test','steam');
+ assert.equal(result.status,400);
+ assert.equal(db.calls.length,0);
+});

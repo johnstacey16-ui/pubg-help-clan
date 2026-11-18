@@ -1,22 +1,25 @@
 'use strict';
 const { createClient } = require('@supabase/supabase-js');
 const { escapeLike } = require('../lib/pubg-utils');
+const {selectSavedConsoleAccount}=require('../lib/saved-console-account');
 
 // Saved Xbox and PlayStation players are eligible, including non-clan accounts.
 // Never expose internal player IDs, PUBG account IDs, or raw database records.
-async function playerHistory(db, suppliedName) {
+async function playerHistory(db, suppliedName, platform='auto') {
   const name = String(suppliedName || '').trim();
-  if (!name || name.length > 100 || /[\u0000-\u001f\u007f,]/.test(name))
-    return { status: 400, data: { error: 'Invalid player name' } };
-  const match = rows => (rows || []).find(x =>
-    x.gamertag?.toLowerCase() === name.toLowerCase());
+  if (!name || name.length > 100 || /[\u0000-\u001f\u007f,]/.test(name) ||
+      !['auto','xbox','psn'].includes(platform))
+    return { status: 400, data: { error: 'Invalid player name or console' } };
   const saved = await db.from('players')
-    .select('id,gamertag,platform')
+    .select('id,gamertag,platform,pubg_account_id')
     .ilike('gamertag', escapeLike(name)).limit(10);
   if (saved.error) throw new Error('Cannot read verified player');
-  const player = match(saved.data);
-  if (!player || !['xbox','psn'].includes(player.platform))
-    return { status: 404, data: { error: 'Saved console player not found' } };
+  const resolved=selectSavedConsoleAccount(saved.data,name,platform);
+  if(resolved.status===404)
+    return {status:404,data:{error:'Saved console player not found'}};
+  if(!resolved.player)
+    return{status:resolved.status,data:resolved.body};
+  const player=resolved.player;
 
   const history = await db.from('player_stat_snapshots')
     .select('observed_at,kills,wins,matches')
@@ -45,9 +48,10 @@ module.exports = async (req,res) => {
   if (req.method !== 'GET') return res.status(405).json({ error:'Method not allowed' });
   res.setHeader('Cache-Control','public, s-maxage=60, stale-while-revalidate=120');
   res.setHeader('X-Content-Type-Options','nosniff');
-  const name = req.query?.name;
+  const name = req.query?.name,platform=req.query?.platform??'auto';
   if (typeof name !== 'string' || !name.trim() || name.length > 100 ||
-      /[\u0000-\u001f\u007f,]/.test(name))
+      /[\u0000-\u001f\u007f,]/.test(name) ||
+      !['auto','xbox','psn'].includes(platform))
     return res.status(400).json({ error:'Invalid player name' });
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY)
     return res.status(503).json({ error:'Data source unavailable' });
@@ -55,7 +59,7 @@ module.exports = async (req,res) => {
     const db=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_KEY,{
       auth:{autoRefreshToken:false,persistSession:false}
     });
-    const result=await playerHistory(db,name);
+    const result=await playerHistory(db,name,platform);
     return res.status(result.status).json(result.data);
   } catch(error) {
     console.error('Public player history read failed:',error.message);
