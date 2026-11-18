@@ -27,7 +27,7 @@ module.exports=async(req,res)=>{
         await officialLeaderboard(db,{platform:req.query?.platform||'xbox',
           region:req.query?.region||'eu',mode:req.query?.mode||'squad',
           season:req.query?.season||undefined}):
-        await publicInsights(db,{name,kind});
+        await publicInsights(db,{name,kind,platform:req.query?.platform??'auto'});
     if(route)res.setHeader('Cache-Control','private, no-store');
     return res.status(result.status).json(result.body);
   } catch(error) {

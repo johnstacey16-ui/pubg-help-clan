@@ -12,10 +12,13 @@ module.exports=async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');
   if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});
   const name=req.query?.name,route=req.query?.route;
+  const platform=req.query?.platform??'auto';
   if(route!==undefined && !['telemetry','rivals','lobby','opponents','clan-board','clan-records','clan-activity'].includes(route))
     return res.status(400).json({error:'Unknown match route'});
   if(!['clan-board','clan-records','clan-activity'].includes(route) && (typeof name!=='string' || !name.trim() || name.length>100))
     return res.status(400).json({error:'Invalid PUBG gamertag'});
+  if(!['auto','xbox','psn'].includes(platform))
+    return res.status(400).json({error:'Invalid console selection'});
   if(!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY)
     return res.status(503).json({error:'Saved data source unavailable'});
   try{
@@ -25,15 +28,15 @@ module.exports=async(req,res)=>{
     const result=route==='clan-activity'?await publicClanActivity(db,req.query?.days):
       route==='clan-records'?await publicClanMatchRecords(db,req.query?.days):
       route==='clan-board'?await publicClanMatchBoard(db,req.query?.days):
-      route==='telemetry'?await publicTelemetry(db,{name,match:req.query?.match}):
-      route==='lobby'?await publicMatchLobby(db,{name,match:req.query?.match}):
-      route==='opponents'?await publicLobbyOpponents(db,{name,
+      route==='telemetry'?await publicTelemetry(db,{name,platform,match:req.query?.match}):
+      route==='lobby'?await publicMatchLobby(db,{name,platform,match:req.query?.match}):
+      route==='opponents'?await publicLobbyOpponents(db,{name,platform,
         days:req.query?.days,map:req.query?.map,mode:req.query?.mode,
         sort:req.query?.sort,opponent:req.query?.opponent}):
-      route==='rivals'?await publicRivalTrends(db,{name,
+      route==='rivals'?await publicRivalTrends(db,{name,platform,
         days:req.query?.days,map:req.query?.map,mode:req.query?.mode,
         opponent:req.query?.opponent}):
-      await cachedPlayerMatches(db,name);
+      await cachedPlayerMatches(db,name,platform);
     if(route)res.setHeader('Cache-Control','private, no-store');
     if(result.body?.retryAfterSeconds)res.setHeader('Retry-After',String(result.body.retryAfterSeconds));
     return res.status(result.status).json(result.body);

@@ -57,6 +57,8 @@
   var findPlayer = function (name) {
     return visiblePlayers().find(p=>p.name.toLowerCase()===String(name).toLowerCase())||null;
   };
+  // UI identity hint only: backend validates saved shard and PUBG account ID.
+  window.PubgSelectedPlatform=function(name){return findPlayer(name)?.platform||'auto';};
   async function lookupAnyPlayer(refresh,nameValue,platformValue,openAfter) {
     var name=String(nameValue||$('console-gamertag').value).trim();
     var platform=platformValue||$('console-platform').value;
@@ -321,7 +323,8 @@
     window.PersonalRivalries?.setPlayer(name);
     if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,[]);
     try{
-      var response=await fetch('/api/public-matches?name='+encodeURIComponent(name),{
+      var response=await fetch('/api/public-matches?name='+encodeURIComponent(name)+
+        '&platform='+encodeURIComponent(window.PubgSelectedPlatform(name)),{
         cache:'no-store',headers:{Accept:'application/json'}
       });
       if(!response.ok)throw Error('Match API HTTP '+response.status);
@@ -393,7 +396,8 @@
     if(kind==='weapons'){insightCache.weapons=null;renderWeaponInsights();}
     $(kind+'-note').textContent='Reading saved '+(kind==='weapons'?'weapon mastery':'squad')+' data for '+name+'…';
     try{
-      var response=await fetch('/api/public-insights?kind='+kind+'&name='+encodeURIComponent(name),{
+      var response=await fetch('/api/public-insights?kind='+kind+'&name='+encodeURIComponent(name)+
+        '&platform='+encodeURIComponent(window.PubgSelectedPlatform(name)),{
         cache:'no-store',headers:{Accept:'application/json'}
       });
       if(!response.ok)throw Error('Insight API HTTP '+response.status);

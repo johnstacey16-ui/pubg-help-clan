@@ -29,7 +29,8 @@
   working=true;$('survival-load').disabled=true;
   $('survival-status').textContent='Reading saved official Survival Mastery…';
   try{
-   const params=new URLSearchParams({name:selected,kind:'survival'});
+   const params=new URLSearchParams({name:selected,kind:'survival',
+     platform:window.PubgSelectedPlatform?.(selected)||'auto'});
    const response=await fetch('/api/public-insights?'+params.toString(),{
     cache:'no-store',headers:{Accept:'application/json'}
    });
@@ -54,7 +55,8 @@
   try{
    const response=await fetch('/api/player-refresh',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:selected,platform:'auto',scope:'survival'})
+    body:JSON.stringify({name:selected,
+       platform:window.PubgSelectedPlatform?.(selected)||'auto',scope:'survival'})
    });
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'PUBG refresh unavailable');

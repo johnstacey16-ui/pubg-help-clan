@@ -49,7 +49,8 @@
    a.name.localeCompare(b.name));
  }
  function parameters(opponent){
-  const params=new URLSearchParams({route:'rivals',name:player});
+  const params=new URLSearchParams({route:'rivals',name:player,
+    platform:window.PubgSelectedPlatform?.(player)||'auto'});
   const days=$('personal-rivals-days').value;
   if(days&&days!=='0')params.set('days',days);
   if(opponent)params.set('opponent',opponent);

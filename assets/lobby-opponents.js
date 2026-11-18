@@ -53,7 +53,8 @@
   $('scout-search').value='';
  }
  function params(opponent){
-  const p=new URLSearchParams({route:'opponents',name,days:$('scout-days').value,
+  const p=new URLSearchParams({route:'opponents',name,platform:window.PubgSelectedPlatform?.(name)||'auto',
+    days:$('scout-days').value,
    sort:$('scout-order').value});
   if($('scout-map').value)p.set('map',$('scout-map').value);
   if($('scout-mode').value)p.set('mode',$('scout-mode').value);
