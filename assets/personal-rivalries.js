@@ -22,7 +22,7 @@
  const fmt=n=>num(n)===null?'—':n.toLocaleString('en-GB');
  const date=v=>typeof v==='string'&&Number.isFinite(Date.parse(v))?
   new Date(v).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}):'Date unavailable';
- let player=null,data=null,requestId=0,detailId=0;
+ let player=null,playerPlatform='auto',data=null,requestId=0,detailId=0;
  function eligible(rows){
   return (Array.isArray(rows)?rows:[]).filter(r=>
    typeof r?.name==='string'&&r.name.length<=90&&
@@ -50,7 +50,7 @@
  }
  function parameters(opponent){
   const params=new URLSearchParams({route:'rivals',name:player,
-    platform:window.PubgMatchPlatform?.(player)||'auto'});
+    platform:playerPlatform});
   const days=$('personal-rivals-days').value;
   if(days&&days!=='0')params.set('days',days);
   if(opponent)params.set('opponent',opponent);
@@ -58,7 +58,10 @@
  }
  function setPlayer(name){
   const selected=typeof name==='string'&&name.trim()?name:null;
-  if(selected!==player){player=selected;data=null;requestId++;detailId++;}
+  const platform=selected?(window.PubgMatchPlatform?.(selected)||'auto'):'auto';
+  if(selected!==player||platform!==playerPlatform){
+   player=selected;playerPlatform=platform;data=null;requestId++;detailId++;
+  }
   if(!$('personal-rivals-player'))return;
   $('personal-rivals-player').textContent=player||'Choose a saved player above';
   $('personal-rivals-load').disabled=!player;
