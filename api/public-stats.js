@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         .select('gamertag,is_clan_member,status,platform,pubg_account_id')
         .eq('is_clan_member', true).limit(1000),
       db.from('players')
-        .select('id,gamertag,platform,total_kills,total_wins,matches_played,last_checked')
+        .select('id,gamertag,platform,pubg_account_id,total_kills,total_wins,matches_played,last_checked')
         .in('platform', ['xbox', 'psn']).limit(1000),
       db.from('player_lifetime_details')
         .select('player_id,game_mode_stats').limit(1000)

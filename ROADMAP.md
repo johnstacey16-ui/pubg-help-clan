@@ -62,6 +62,7 @@
 - [x] Prevent wrong-console scoped refreshes and saved season/ranked reads for existing Xbox/PSN name collisions: Auto returns a console choice before reserving PUBG capacity; an explicit console selects that verified saved account. The season UI sends its selected player's console. Production account-collision verification remains open.
 - [x] Apply the same saved-account console rule to cached match history, weapon/teammate/survival insights, match lobbies, opponent scouting and telemetry/rivalry reports. The dashboard passes the selected console. Real production name-collision verification is still outstanding.
 - [x] Include lifetime snapshot history in console-safe public reads, with account-specific snapshot lookup and a platform-aware profile request; production name-collision verification remains open.
+- [x] Prevent official clan lifetime totals from counting a same-name outsider on the other console. Resolve roster assignments by saved PUBG ID or explicit platform and mark unresolved name collisions ambiguous; no private IDs in public output.
 - [x] Website PUBG refresh for weapon mastery, recent matches, current season and ranked
 - [x] Per-player, per-refresh-type 15-minute cooldown plus shared 90-second global web limit
 - [x] Bound recent match detail refresh to five match IDs; use PUBG's non-rate-limited console matches endpoint

@@ -84,3 +84,70 @@ test('longest kill uses maximum across modes, not summed distance',()=>{
  assert.equal(a.headshots,11);
  assert.equal(a.revives,null);
 });
+
+test('a one-console official roster assignment never counts its same-name outsider',()=>{
+ const f=fixture();
+ f.roster=[{gamertag:'Mirror',platform:'xbox',status:'matched',is_clan_member:true}];
+ f.players=[
+  {id:11,gamertag:'Mirror',platform:'psn',pubg_account_id:'account.OUTSIDER',
+   total_kills:9000,total_wins:300,matches_played:300},
+  {id:12,gamertag:'Mirror',platform:'xbox',pubg_account_id:'account.MEMBER',
+   total_kills:15,total_wins:1,matches_played:12}
+ ];
+ f.details=[];
+ const result=shapeWebStats(f);
+ assert.deepEqual(result.players.map(p=>p.platform),['xbox']);
+ assert.equal(result.totals.kills,15);
+ assert.equal(result.roster.verified,1);
+ assert.doesNotMatch(JSON.stringify(result),/OUTSIDER|MEMBER|pubg_account_id|player_id/);
+});
+
+test('unqualified same-name roster never fabricates a verified console account',()=>{
+ const f=fixture();
+ f.roster=[{gamertag:'Mirror',status:'matched',is_clan_member:true}];
+ f.players=[
+  {id:11,gamertag:'Mirror',platform:'xbox',total_kills:100},
+  {id:12,gamertag:'Mirror',platform:'psn',total_kills:200}
+ ];
+ f.details=[];
+ const result=shapeWebStats(f);
+ assert.equal(result.roster.verified,0);
+ assert.equal(result.roster.states.ambiguous,1);
+ assert.equal(result.totals.kills,0);
+ assert.equal(result.players.length,0);
+ assert.equal(result.roster.entries[0].verified,false);
+});
+
+test('two explicit official console assignments count each account once',()=>{
+ const f=fixture();
+ f.roster=[
+  {gamertag:'Mirror',platform:'xbox',status:'matched',is_clan_member:true},
+  {gamertag:'Mirror',platform:'psn',status:'matched',is_clan_member:true}
+ ];
+ f.players=[
+  {id:11,gamertag:'Mirror',platform:'xbox',total_kills:45,total_wins:1,matches_played:20},
+  {id:12,gamertag:'Mirror',platform:'psn',total_kills:19,total_wins:2,matches_played:30}
+ ];
+ f.details=[];
+ const result=shapeWebStats(f);
+ assert.equal(result.roster.total,2);
+ assert.equal(result.roster.verified,2);
+ assert.deepEqual(result.players.map(p=>p.platform),['xbox','psn']);
+ assert.equal(result.totals.kills,64);
+ assert.equal(result.roster.entries.filter(r=>r.verified).length,2);
+});
+
+test('an exact saved PUBG account assignment excludes mismatched player records',()=>{
+ const f=fixture();
+ f.roster=[{gamertag:'Mirror',status:'matched',is_clan_member:true,
+   pubg_account_id:'account.PSNKNOWN'}];
+ f.players=[
+  {id:11,gamertag:'Mirror',platform:'xbox',pubg_account_id:'account.XBOXOTHER',total_kills:120},
+  {id:12,gamertag:'Mirror',platform:'psn',pubg_account_id:'account.PSNKNOWN',total_kills:8}
+ ];
+ f.details=[];
+ const result=shapeWebStats(f);
+ assert.equal(result.roster.verified,1);
+ assert.equal(result.players[0].platform,'psn');
+ assert.equal(result.totals.kills,8);
+});
