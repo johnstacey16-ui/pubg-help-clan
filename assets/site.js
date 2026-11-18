@@ -49,16 +49,39 @@
   var visiblePlayers = function () {
     var combined=[...(data?.players||[])];
     for(const p of extraPlayers) {
-      var i=combined.findIndex(x=>x.name.toLowerCase()===p.name.toLowerCase());
+      // A saved Xbox account must never overwrite a same-name PSN account.
+      var i=combined.findIndex(x=>x.platform===p.platform&&
+        x.name.toLowerCase()===p.name.toLowerCase());
       if(i>=0)combined[i]=p;else combined.push(p);
     }
     return combined;
   };
-  var findPlayer = function (name) {
-    return visiblePlayers().find(p=>p.name.toLowerCase()===String(name).toLowerCase())||null;
+  // A valid PUBG gamertag cannot contain a comma, making JSON tuple option
+  // values collision-proof for console duplicates. Unique names stay unchanged.
+  var playerOptionValue=function(p,people){
+    return people.some(x=>x!==p&&x.name.toLowerCase()===p.name.toLowerCase())
+      ?JSON.stringify([p.platform,p.name]):p.name;
   };
-  // UI identity hint only: backend validates saved shard and PUBG account ID.
-  window.PubgSelectedPlatform=function(name){return findPlayer(name)?.platform||'auto';};
+  var playerChoices=function(){
+    var people=visiblePlayers();
+    return people.map(p=>({player:p,value:playerOptionValue(p,people)}));
+  };
+  var findPlayer=function(value,platform='auto'){
+    var people=visiblePlayers(),input=String(value||'');
+    var specific=people.filter(p=>playerOptionValue(p,people)===input&&
+      (platform==='auto'||p.platform===platform));
+    if(specific.length===1)return specific[0];
+    var matches=people.filter(p=>p.name.toLowerCase()===input.toLowerCase()&&
+      (platform==='auto'||p.platform===platform));
+    // Never return the first console when a bare name is ambiguous.
+    return matches.length===1?matches[0]:null;
+  };
+  // Browser hints only. The server independently verifies console identities.
+  window.PubgSelectedPlatform=function(value){return findPlayer(value)?.platform||'auto';};
+  window.PubgMatchPlatform=function(name){
+    var p=findPlayer(matchName);
+    return p&&p.name.toLowerCase()===String(name||'').toLowerCase()?p.platform:'auto';
+  };
   async function lookupAnyPlayer(refresh,nameValue,platformValue,openAfter) {
     var name=String(nameValue||$('console-gamertag').value).trim();
     var platform=platformValue||$('console-platform').value;
@@ -97,7 +120,8 @@
       var p=payload.player;
       // Remember the one actual console returned by the saved or live lookup.
       if(['xbox','psn'].includes(p.platform))$('console-platform').value=p.platform;
-      extraPlayers=extraPlayers.filter(x=>!(x.name.toLowerCase()===p.name.toLowerCase()));
+      extraPlayers=extraPlayers.filter(x=>!(x.platform===p.platform&&
+        x.name.toLowerCase()===p.name.toLowerCase()));
       extraPlayers.push(p);
       if(data){
         renderCompare();chooseMatchPlayer(matchName);chooseInsightPlayers();chooseSeasonPlayer();
@@ -112,8 +136,9 @@
         '<span><strong>'+fmt(p.matches)+'</strong> matches</span></div>'+
         '<p class="small muted">Saved PUBG update: '+escapeHtml(dateText(p.updatedAt))+
         (payload.refreshState?' · '+escapeHtml(payload.refreshState):'')+'</p>'+
-        '<button type="button" class="secondary" data-profile="'+escapeHtml(p.name)+'">Open full player profile →</button>';
-      if(openAfter)openProfile(p.name,true);
+        '<button type="button" class="secondary" data-profile="'+escapeHtml(p.name)+
+        '" data-profile-platform="'+escapeHtml(p.platform)+'">Open full player profile →</button>';
+      if(openAfter)openProfile(p.name,true,p.platform);
       if(refresh&&payload.refreshState==='refreshed')reload();
       return true;
     }catch(error){
@@ -182,7 +207,8 @@
     });
   }
   function playerLink(p) {
-    return '<button class="player-button" type="button" data-profile="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</button>';
+    return '<button class="player-button" type="button" data-profile="' + escapeHtml(p.name) +
+      '" data-profile-platform="'+escapeHtml(p.platform)+'">' + escapeHtml(p.name) + '</button>';
   }
   function renderOverview() {
     $('kills').textContent = fmt(data.totals.kills);
@@ -695,7 +721,7 @@
     if(window.CommandCentre?.radar)window.CommandCentre.radar('compare-radar',a,b,mode,data.players);
   }
 
-  var profileRequest = 0;
+  var profileRequest = 0,profilePlatform=null;
   function makeHistoryChart(points, metric) {
     var w=620,h=205,left=44,right=14,top=16,bottom=31;
     var values=points.map(function(p){return Math.max(0,Number(p[metric])||0);});
@@ -716,17 +742,18 @@
       '<polyline fill="none" stroke="#39e4c3" stroke-linejoin="round" stroke-linecap="round" stroke-width="3" points="'+route+'"/>'+
       circles+'</svg>';
   }
-  async function loadProfileHistory(name) {
+  async function loadProfileHistory(name,platform) {
     var id=++profileRequest,element=$('profile-history');
     if(!element)return;
     element.textContent='Loading actual saved PUBG snapshots…';
     try {
       var response=await fetch('/api/player-history?name='+encodeURIComponent(name)+
-        '&platform='+encodeURIComponent(window.PubgSelectedPlatform(name)),
+        '&platform='+encodeURIComponent(platform),
         {headers:{Accept:'application/json'}});
       if(!response.ok)throw Error('History API returned HTTP '+response.status);
       var result=await response.json();
-      if(id!==profileRequest || $('profile-name').textContent!==name)return;
+      if(id!==profileRequest || $('profile-name').textContent!==name||
+        profilePlatform!==platform)return;
       var points=Array.isArray(result.points)?result.points:[];
       if(points.length<2) {
         element.innerHTML='<p class="history-empty">📈 Only the first verified snapshot is saved so far. The chart will grow as the bot refreshes this player from PUBG.</p>'+
@@ -749,8 +776,9 @@
     }
   }
 
-  function openProfile(name, fromLink) {
-    var p=findPlayer(name);if(!p)return;
+  function openProfile(name, fromLink, platform='auto') {
+    var p=findPlayer(name,platform);if(!p)return;
+    profilePlatform=p.platform;
     $('profile-name').textContent=p.name;
     $('profile-console').textContent=p.platform==='xbox'?'Xbox':'PlayStation';
     $('profile-body').innerHTML = '<div class="profile-stats">' +
@@ -784,7 +812,7 @@
     if(typeof $('profile').showModal==='function') {
       if(!$('profile').open)$('profile').showModal();
     } else $('profile').setAttribute('open','');
-    loadProfileHistory(p.name);
+    loadProfileHistory(p.name,p.platform);
   }
   async function reload() {
     $('reload').disabled=true;
@@ -830,7 +858,7 @@
     var favourite=e.target.closest&&e.target.closest('[data-favourite]');
     if(favourite)toggleRosterFavourite(favourite.dataset.favourite);
     var b=e.target.closest&&e.target.closest('[data-profile]');
-    if(b)openProfile(b.dataset.profile);
+    if(b)openProfile(b.dataset.profile,false,b.dataset.profilePlatform||'auto');
     var fullStats=e.target.closest&&e.target.closest('[data-full-stats]');
     if(fullStats){window.FullPubgStats?.select(fullStats.dataset.fullStats);
       if($('profile').open)$('profile').close();go('full-stats');}
@@ -858,8 +886,9 @@
   });
   $('share-profile').addEventListener('click',async function(){
     var name=$('profile-name').textContent;
-    var player=findPlayer(name);
-    var url=location.origin+'/dashboard/#player/'+(player?.platform||'xbox')+'/'+encodeURIComponent(name);
+    var player=findPlayer(name,profilePlatform||'auto');
+    if(!player)return;
+    var url=location.origin+'/dashboard/#player/'+player.platform+'/'+encodeURIComponent(name);
     try {
       if(!navigator.clipboard?.writeText)throw Error('Clipboard unavailable');
       await navigator.clipboard.writeText(url);
@@ -987,8 +1016,8 @@
       return;
     }
     if(!sharedName)return;
-    if(findPlayer(sharedName) && (!sharedPlatform||findPlayer(sharedName).platform===sharedPlatform)){
-      openProfile(sharedName,true);
+    if(findPlayer(sharedName,sharedPlatform||'auto')){
+      openProfile(sharedName,true,sharedPlatform||'auto');
     } else {
       await lookupAnyPlayer(false,sharedName,sharedPlatform||'auto',true);
     }
