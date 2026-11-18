@@ -48,3 +48,35 @@ test('saved rival server reports compute leaders over ALL valid groups',()=>{
  assert.match(s,/web:kill-rivalry:v1:/);
 });
 function readSource(){return fs.readFileSync(path.join(__dirname,'../lib/web-rival-intelligence.js'),'utf8');}
+
+test('switching Xbox to PSN with an identical name clears stale rival reports',async()=>{
+ const vm=require('node:vm'),source=fs.readFileSync(
+  path.join(__dirname,'../assets/personal-rivalries.js'),'utf8');
+ const nodes={},requests=[];
+ const get=id=>nodes[id]||(nodes[id]={value:'',textContent:'',innerHTML:'',
+  disabled:false,addEventListener(){},scrollIntoView(){}});
+ let platform='xbox';
+ const document={getElementById:get};
+ const window={document,PubgMatchPlatform(){return platform;}};
+ const fetch=url=>new Promise(resolve=>requests.push({url,resolve}));
+ vm.runInNewContext(source,{document,window,fetch,URLSearchParams,console});
+ const api=window.PersonalRivalries;
+ api.setPlayer('TwinTag');
+ const xbox=api.load();
+ assert.equal(new URL(requests[0].url,'https://example.test')
+  .searchParams.get('platform'),'xbox');
+ platform='psn';
+ api.setPlayer('TwinTag');
+ const psn=api.load();
+ assert.equal(new URL(requests[1].url,'https://example.test')
+  .searchParams.get('platform'),'psn');
+ const body=matches=>({schemaVersion:2,rivals:[],matchesScanned:matches,
+  matchesAnalysed:matches});
+ requests[0].resolve({ok:true,json:async()=>body(99)});
+ await xbox;
+ assert.doesNotMatch(get('personal-rivals-status').textContent,/99/);
+ requests[1].resolve({ok:true,json:async()=>body(2)});
+ await psn;
+ assert.match(get('personal-rivals-status').textContent,/2 of 2/);
+ assert.doesNotMatch(get('personal-rivals-status').textContent,/99/);
+});
