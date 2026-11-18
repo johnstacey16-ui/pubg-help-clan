@@ -139,7 +139,7 @@
   $('lobby-player-table').innerHTML='';
   try{
    const params=new URLSearchParams({
-    route:'lobby',name:selectedName,platform:window.PubgSelectedPlatform?.(selectedName)||'auto',
+    route:'lobby',name:selectedName,platform:window.PubgMatchPlatform?.(selectedName)||'auto',
      match:$('lobby-match').value
    });
    const response=await fetch('/api/public-matches?'+params.toString(),{
