@@ -263,7 +263,12 @@
     var q=$('search').value.trim().toLowerCase(),platform=$('player-console').value;
     var status=$('player-status').value,sort=$('roster-sort').value;
     var favOnly=$('roster-favs-only').checked;
-    var byName=new Map(data.players.map(function(p){return [p.name.toLowerCase(),p];}));
+    var byName=new Map(data.players.map(function(p){
+      return [p.platform+':'+p.name.toLowerCase(),p];
+    }));
+    var memberPlayer=function(row){
+      return row.verified?byName.get(row.platform+':'+row.name.toLowerCase()):null;
+    };
     var roster=data.roster.entries.filter(function(p){
       return (!q||p.name.toLowerCase().includes(q)) &&
         (platform==='all'||(platform==='unknown'?!p.platform:p.platform===platform)) &&
@@ -277,8 +282,8 @@
         if(favour)return favour;
       }
       if(sort==='kills'||sort==='wins'){
-        var diff=(byName.get(b.name.toLowerCase())?.[sort]??-1)-
-          (byName.get(a.name.toLowerCase())?.[sort]??-1);
+        var diff=(memberPlayer(b)?.[sort]??-1)-
+          (memberPlayer(a)?.[sort]??-1);
         if(diff)return diff;
       }
       return a.name.localeCompare(b.name);
@@ -300,7 +305,7 @@
     $('roster-prev').disabled=rosterPage<=1;
     $('roster-next').disabled=rosterPage>=pages;
     $('roster-table').innerHTML=shown.map(function(r){
-      var p=byName.get(r.name.toLowerCase()),st=r.verified?'verified':r.status;
+      var p=memberPlayer(r),st=r.verified?'verified':r.status;
       var fav=rosterFavourites.has(favouriteKey(r.name));
       var label={verified:'✓ Verified',pending:'⏳ Pending',
         ambiguous:'? Ambiguous',not_found:'! Not found'}[st]||st;
@@ -328,19 +333,24 @@
 
   function chooseMatchPlayer(preferred) {
     if(!data)return;
-    var names=visiblePlayers().map(function(p){return p.name;});
-    if(preferred && names.indexOf(preferred)!==-1)matchName=preferred;
-    if(names.indexOf(matchName)===-1)matchName=names[0]||null;
-    $('match-player').innerHTML=names.map(function(name){
-      return '<option value="'+escapeHtml(name)+'"'+(name===matchName?' selected':'')+'>'+escapeHtml(name)+'</option>';
+    var options=playerChoices(),names=options.map(x=>x.value);
+    var preferredPlayer=preferred?findPlayer(preferred):null;
+    var key=preferredPlayer?playerOptionValue(preferredPlayer,visiblePlayers()):null;
+    if(key&&names.includes(key))matchName=key;
+    if(!names.includes(matchName))matchName=names[0]||null;
+    $('match-player').innerHTML=options.map(function(x){
+      return '<option value="'+escapeHtml(x.value)+'"'+(x.value===matchName?' selected':'')+'>'+
+        escapeHtml(x.player.name)+' · '+(x.player.platform==='xbox'?'Xbox':'PlayStation')+'</option>';
     }).join('');
+    $('match-player').value=matchName||'';
     $('match-player').disabled=!matchName;
     $('match-reload').disabled=!matchName;
     if(current==='matches')loadCachedMatches();
   }
   async function loadCachedMatches() {
-    if(!matchName)return;
-    var request=++matchRequest,name=matchName;
+    var choice=matchName,p=findPlayer(choice);
+    if(!p)return;
+    var request=++matchRequest,name=p.name;
     $('match-note').textContent='Reading saved console match data for '+name+'…';
     $('match-results').innerHTML='';
     window.MatchLab?.reset();
@@ -350,12 +360,12 @@
     if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,[]);
     try{
       var response=await fetch('/api/public-matches?name='+encodeURIComponent(name)+
-        '&platform='+encodeURIComponent(window.PubgSelectedPlatform(name)),{
+        '&platform='+encodeURIComponent(p.platform),{
         cache:'no-store',headers:{Accept:'application/json'}
       });
       if(!response.ok)throw Error('Match API HTTP '+response.status);
       var result=await response.json();
-      if(request!==matchRequest || matchName!==name)return;
+      if(request!==matchRequest || matchName!==choice)return;
       if(result.schemaVersion!==1||!Array.isArray(result.matches))throw Error('Unexpected match schema');
       if(window.TelemetryView?.matchesChanged)window.TelemetryView.matchesChanged(name,result.matches);
       window.MatchLab?.render(result);
@@ -691,14 +701,16 @@
   }
   function renderCompare() {
     if(!data)return;
-    var names=visiblePlayers().map(function(p){return p.name;});
+    var options=playerChoices(),names=options.map(x=>x.value);
     if(!names.length){$('compare-output').textContent='No verified clan players yet.';return;}
     if(!names.includes(compareA))compareA=names[0];
     if(!names.includes(compareB))compareB=names[Math.min(1,names.length-1)];
     [['compare-one',compareA],['compare-two',compareB]].forEach(function(pair){
-      $(pair[0]).innerHTML=names.map(function(n){
-        return '<option value="'+escapeHtml(n)+'"'+(n===pair[1]?' selected':'')+'>'+escapeHtml(n)+'</option>';
+      $(pair[0]).innerHTML=options.map(function(x){
+        return '<option value="'+escapeHtml(x.value)+'"'+(x.value===pair[1]?' selected':'')+'>'+
+          escapeHtml(x.player.name)+' · '+(x.player.platform==='xbox'?'Xbox':'PlayStation')+'</option>';
       }).join('');
+      $(pair[0]).value=pair[1];
     });
     var a=findPlayer(compareA),b=findPlayer(compareB),mode=$('compare-mode').value;
     var rows=[
@@ -709,7 +721,8 @@
       ['Longest kill (m)','longestKill']
     ];
     $('compare-output').innerHTML=
-      '<div class="compare-grid"><strong>'+escapeHtml(a.name)+'</strong><span>VS</span><strong>'+escapeHtml(b.name)+'</strong></div>'+
+      '<div class="compare-grid"><strong>'+escapeHtml(a.name+' · '+(a.platform==='xbox'?'Xbox':'PlayStation'))+
+        '</strong><span>VS</span><strong>'+escapeHtml(b.name+' · '+(b.platform==='xbox'?'Xbox':'PlayStation'))+'</strong></div>'+
       rows.map(function(row){
         var av=compareValue(a,row[1],mode),bv=compareValue(b,row[1],mode);
         var decimal=['kd','winRate','longestKill'].includes(row[1]);
