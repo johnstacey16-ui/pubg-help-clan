@@ -111,6 +111,7 @@ test('mismatched console and invalid source identity cannot trigger a refresh',a
 
 test('season browser requests include selected console instead of implicit auto',()=>{
   const source=fs.readFileSync(path.join(__dirname,'../assets/site.js'),'utf8');
-  assert.match(source,/platform=findPlayer\(name\)\?\.platform\|\|'auto'/);
+  assert.match(source,/var name=p\.name,type=\$\('season-type'\)\.value/);
+  assert.match(source,/var platform=p\.platform/);
   assert.match(source,/\&platform='\+encodeURIComponent\(platform\)/);
 });
