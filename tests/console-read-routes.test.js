@@ -69,8 +69,10 @@ test('unrecognised console rejects early without database access',async()=>{
 });
 test('browser and handlers carry the selected platform through all supported views',()=>{
  const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
- for(const f of ['assets/site.js','assets/match-lobby.js','assets/lobby-opponents.js',
-   'assets/personal-rivalries.js','assets/telemetry-view.js','assets/survival-view.js'])
+ for(const f of ['assets/match-lobby.js','assets/lobby-opponents.js',
+   'assets/personal-rivalries.js','assets/telemetry-view.js'])
+   assert.match(read(f),/PubgMatchPlatform/,f);
+ for(const f of ['assets/site.js','assets/survival-view.js'])
    assert.match(read(f),/PubgSelectedPlatform/,f);
  assert.match(read('api/public-matches.js'),/cachedPlayerMatches\(db,name,platform\)/);
  assert.match(read('api/public-insights.js'),/publicInsights\(db,\{name,kind,platform:/);
