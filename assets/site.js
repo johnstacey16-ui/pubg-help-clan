@@ -812,11 +812,11 @@
         return '<div class="profile-mode"><strong>'+escapeHtml(modeName(m))+'</strong><span>'+fmt(s.roundsPlayed)+
           ' matches · '+fmt(s.kills)+' kills · '+fmt(s.wins)+' wins</span></div>';
       }).join('') || '<p class="muted">No mode details saved yet.</p>') +
-      '<div class="profile-insight-actions"><button class="secondary" type="button" data-match-player="'+escapeHtml(p.name)+'">⚑ Matches</button>'+
-      '<button class="secondary" type="button" data-insight-page="weapons" data-insight-name="'+escapeHtml(p.name)+'">⌖ Weapons</button>'+
-      '<button class="secondary" type="button" data-insight-page="teammates" data-insight-name="'+escapeHtml(p.name)+'">♟ Teammates</button>'+
-      '<button class="secondary" type="button" data-insight-page="season" data-insight-name="'+escapeHtml(p.name)+'">🏆 Season</button>'+ 
-       '<button class="secondary" type="button" data-full-stats="'+escapeHtml(p.name)+'">▦ All statistics</button></div>'+
+      '<div class="profile-insight-actions"><button class="secondary" type="button" data-match-player="'+escapeHtml(playerOptionValue(p,visiblePlayers()))+'">⚑ Matches</button>'+
+      '<button class="secondary" type="button" data-insight-page="weapons" data-insight-name="'+escapeHtml(playerOptionValue(p,visiblePlayers()))+'">⌖ Weapons</button>'+
+      '<button class="secondary" type="button" data-insight-page="teammates" data-insight-name="'+escapeHtml(playerOptionValue(p,visiblePlayers()))+'">♟ Teammates</button>'+
+      '<button class="secondary" type="button" data-insight-page="season" data-insight-name="'+escapeHtml(playerOptionValue(p,visiblePlayers()))+'">🏆 Season</button>'+ 
+       '<button class="secondary" type="button" data-full-stats="'+escapeHtml(playerOptionValue(p,visiblePlayers()))+'">▦ All statistics</button></div>'+
       '<h3>Advanced lifetime statistics</h3><div class="advanced-stats">'+
       [['Damage',p.advanced?.damage],['Headshots',p.advanced?.headshots],['Assists',p.advanced?.assists],
        ['Knockdowns',p.advanced?.knocks],['Revives',p.advanced?.revives],['Top 10',p.advanced?.top10],
@@ -1025,7 +1025,8 @@
       }
       if(linked){
         // Avoid another request when the initial reload already selected them.
-        if(matchName!==linked.name)chooseMatchPlayer(linked.name);
+        var linkedChoice=playerOptionValue(linked,visiblePlayers());
+        if(matchName!==linkedChoice)chooseMatchPlayer(linkedChoice);
         var targetId=matchSharedView==='rivals'?'personal-rivals-panel':
           matchSharedView==='scout'?'scout-panel':'match-performance-panel';
         var target=document.getElementById(targetId);
