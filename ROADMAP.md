@@ -59,6 +59,7 @@
 - [x] Accept omitted platform on website API requests as Auto-detect (no second account required)
 - [x] If both console shards return matching names, request a manual console choice instead of creating duplicate profiles
 - [ ] Evaluate genuinely distinct Xbox and PSN accounts sharing an identical displayed name only if this becomes a real requirement
+- [x] Prevent wrong-console scoped refreshes and saved season/ranked reads for existing Xbox/PSN name collisions: Auto returns a console choice before reserving PUBG capacity; an explicit console selects that verified saved account. The season UI sends its selected player's console. Production account-collision verification remains open.
 - [x] Website PUBG refresh for weapon mastery, recent matches, current season and ranked
 - [x] Per-player, per-refresh-type 15-minute cooldown plus shared 90-second global web limit
 - [x] Bound recent match detail refresh to five match IDs; use PUBG's non-rate-limited console matches endpoint

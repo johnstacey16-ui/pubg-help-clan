@@ -582,8 +582,10 @@
     $('season-history-summary').innerHTML='';
     $('season-history-note').textContent='Reading stored PUBG season observations…';
     try{
+      var platform=findPlayer(name)?.platform||'auto';
       var result=await fetch('/api/public-season?name='+encodeURIComponent(name)+
-        '&type='+encodeURIComponent(type),{cache:'no-store',headers:{Accept:'application/json'}});
+        '&platform='+encodeURIComponent(platform)+'&type='+encodeURIComponent(type),
+        {cache:'no-store',headers:{Accept:'application/json'}});
       if(!result.ok)throw Error('HTTP '+result.status);
       var payload=await result.json();
       if(request!==seasonRequest||seasonName!==name||type!==$('season-type').value)return;
