@@ -53,3 +53,32 @@ test('Refresh Survival uses existing same-origin POST route and known console au
  });
  assert.match(b.requests[1].url,/kind=survival/);
 });
+
+test('Survival Mastery can select a saved PSN identity explicitly',async()=>{
+ const b=browser();
+ b.api.setPlayers([{name:'Hero',platform:'xbox'},{name:'Hero',platform:'psn'}]);
+ b.get('survival-platform').value='psn';
+ await b.get('survival-refresh').events.click();
+ assert.deepEqual(JSON.parse(b.requests[0].options.body),{
+  name:'Hero',platform:'psn',scope:'survival'
+ });
+ const read=new URL(b.requests[1].url,'https://example.test');
+ assert.equal(read.searchParams.get('name'),'Hero');
+ assert.equal(read.searchParams.get('platform'),'psn');
+ assert.equal(read.searchParams.get('kind'),'survival');
+ assert.equal((b.get('survival-known').innerHTML.match(/value="Hero"/g)||[]).length,1,
+  'duplicate console names appear once in the name suggestions');
+});
+test('changing a gamertag resets any previously selected console',()=>{
+ const b=browser();
+ b.get('survival-platform').value='psn';
+ b.get('survival-name').events.input();
+ assert.equal(b.get('survival-platform').value,'auto');
+});
+test('both standalone and combined dashboard include Survival console selection',()=>{
+ for(const source of ['index.html','training/index.html']){
+  const html=fs.readFileSync(path.join(__dirname,'..',source),'utf8');
+  assert.match(html,/id="survival-platform"/);
+  assert.match(html,/<option value="psn">PlayStation<\/option>/);
+ }
+});
