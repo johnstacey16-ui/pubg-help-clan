@@ -11,6 +11,11 @@
  const number=v=>typeof v==='number'&&Number.isFinite(v)?
   v.toLocaleString('en-GB',{maximumFractionDigits:0}):'—';
  const name=()=>$('survival-name').value.trim();
+ const selectedPlatform=()=>{
+  const explicit=$('survival-platform')?.value;
+  if(['xbox','psn'].includes(explicit))return explicit;
+  return window.PubgSelectedPlatform?.(name())||'auto';
+ };
  function render(data){
   const values=data?.stats,found=stats.filter(k=>values&&
    typeof values[k]==='number'&&Number.isFinite(values[k]));
@@ -25,19 +30,19 @@
  }
  async function load(){
   if(!name()){$('survival-status').textContent='Enter a saved console gamertag.';return;}
-  const request=++seq,selected=name();
+  const request=++seq,selected=name(),platform=selectedPlatform();
   working=true;$('survival-load').disabled=true;
   $('survival-status').textContent='Reading saved official Survival Mastery…';
   try{
    const params=new URLSearchParams({name:selected,kind:'survival',
-     platform:window.PubgSelectedPlatform?.(selected)||'auto'});
+     platform});
    const response=await fetch('/api/public-insights?'+params.toString(),{
     cache:'no-store',headers:{Accept:'application/json'}
    });
    const data=await response.json();
    if(!response.ok||data.schemaVersion!==1||data.kind!=='survival')
     throw Error(data.error||'Saved Survival Mastery unavailable');
-   if(request===seq&&selected===name())render(data);
+   if(request===seq&&selected===name()&&platform===selectedPlatform())render(data);
   }catch(error){
    if(request!==seq)return;
    $('survival-status').textContent=error.message;
@@ -49,18 +54,17 @@
  async function refresh(){
   const selected=name();
   if(!selected){$('survival-status').textContent='Enter a saved console player.';return;}
-  const request=++seq,button=$('survival-refresh');
+  const request=++seq,button=$('survival-refresh'),platform=selectedPlatform();
   button.disabled=true;
   $('survival-status').textContent='Requesting PUBG Survival Mastery with the shared API budget…';
   try{
    const response=await fetch('/api/player-refresh',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:selected,
-       platform:window.PubgSelectedPlatform?.(selected)||'auto',scope:'survival'})
+    body:JSON.stringify({name:selected,platform,scope:'survival'})
    });
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'PUBG refresh unavailable');
-   if(request!==seq||selected!==name())return;
+   if(request!==seq||selected!==name()||platform!==selectedPlatform())return;
    await load();
   }catch(error){
    if(request===seq)$('survival-status').textContent=error.message+
@@ -69,13 +73,16 @@
  }
  function setPlayers(players){
   const list=Array.isArray(players)?players:[];
-  $('survival-known').innerHTML=list.map(p=>
-   '<option value="'+escape(p.name)+'"></option>').join('');
+  $('survival-known').innerHTML=[...new Set(list.map(p=>p.name))].map(name=>
+   '<option value="'+escape(name)+'"></option>').join('');
   if(!name()&&list.length)$('survival-name').value=list[0].name;
  }
  function show(){if(name()&&!working)load();}
  $('survival-load').addEventListener('click',load);
  $('survival-refresh').addEventListener('click',refresh);
- $('survival-name').addEventListener('input',function(){seq++;});
+ $('survival-name').addEventListener('input',function(){
+  seq++;if($('survival-platform'))$('survival-platform').value='auto';
+ });
+ $('survival-platform')?.addEventListener('change',function(){seq++;});
  window.SurvivalView={setPlayers,show};
 })();
