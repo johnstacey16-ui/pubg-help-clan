@@ -85,7 +85,7 @@
  }
  function rivalsParams(opponent){
   const params=new URLSearchParams({name:person,route:'rivals',
-    platform:window.PubgSelectedPlatform?.(person)||'auto'});
+    platform:window.PubgMatchPlatform?.(person)||'auto'});
   const days=$('telemetry-rivals-days').value||'0';
   if(days!=='0')params.set('days',days);
   const map=$('telemetry-rivals-map').value,mode=$('telemetry-rivals-mode').value;
@@ -237,7 +237,7 @@
   $('telemetry-report').innerHTML='';
   try{
    const params=new URLSearchParams({name:person,match:$('telemetry-match').value,route:'telemetry',
-      platform:window.PubgSelectedPlatform?.(person)||'auto'});
+      platform:window.PubgMatchPlatform?.(person)||'auto'});
    const res=await fetch('/api/public-telemetry?'+params.toString(),{cache:'no-store'});
    const body=await res.json();
    if(!res.ok)throw Error((body.error||'Telemetry unavailable')+
