@@ -400,13 +400,16 @@
 
   function chooseInsightPlayers(preferredKind,preferredName) {
     if(!data)return;
-    var names=visiblePlayers().map(function(p){return p.name;});
+    var options=playerChoices(),names=options.map(x=>x.value);
     for(const kind of ['weapons','teammates']){
-      if(preferredKind===kind&&names.includes(preferredName))insightNames[kind]=preferredName;
+      var preferred=kind===preferredKind?findPlayer(preferredName):null;
+      var key=preferred?playerOptionValue(preferred,visiblePlayers()):null;
+      if(key&&names.includes(key))insightNames[kind]=key;
       if(!names.includes(insightNames[kind]))insightNames[kind]=names[0]||null;
       var picker=$(kind+'-player');
-      picker.innerHTML=names.map(function(name){
-        return '<option value="'+escapeHtml(name)+'"'+(name===insightNames[kind]?' selected':'')+'>'+escapeHtml(name)+'</option>';
+      picker.innerHTML=options.map(function(x){
+        return '<option value="'+escapeHtml(x.value)+'"'+(x.value===insightNames[kind]?' selected':'')+'>'+
+          escapeHtml(x.player.name)+' · '+(x.player.platform==='xbox'?'Xbox':'PlayStation')+'</option>';
       }).join('');
       picker.value=insightNames[kind]||'';
       picker.disabled=!insightNames[kind];
@@ -426,19 +429,19 @@
   }
 
   async function loadInsight(kind) {
-    var name=insightNames[kind];
-    if(!name)return;
-    var request=++insightRequests[kind];
+    var choice=insightNames[kind],p=findPlayer(choice);
+    if(!p)return;
+    var name=p.name,request=++insightRequests[kind];
     if(kind==='weapons'){insightCache.weapons=null;renderWeaponInsights();}
     $(kind+'-note').textContent='Reading saved '+(kind==='weapons'?'weapon mastery':'squad')+' data for '+name+'…';
     try{
       var response=await fetch('/api/public-insights?kind='+kind+'&name='+encodeURIComponent(name)+
-        '&platform='+encodeURIComponent(window.PubgSelectedPlatform(name)),{
+        '&platform='+encodeURIComponent(p.platform),{
         cache:'no-store',headers:{Accept:'application/json'}
       });
       if(!response.ok)throw Error('Insight API HTTP '+response.status);
       var result=await response.json();
-      if(request!==insightRequests[kind]||insightNames[kind]!==name)return;
+      if(request!==insightRequests[kind]||insightNames[kind]!==choice)return;
       if(result.schemaVersion!==1||result.kind!==kind||!Array.isArray(result.items))throw Error('Unexpected response');
       insightCache[kind]=result;
       $(kind+'-note').textContent=result.note+' · '+fmt(result.count)+' '+
@@ -454,12 +457,14 @@
 
   function chooseSeasonPlayer(preferred) {
     if(!data)return;
-    var names=visiblePlayers().map(function(p){return p.name;});
-    if(preferred&&names.includes(preferred))seasonName=preferred;
+    var options=playerChoices(),names=options.map(x=>x.value),chosen=findPlayer(preferred);
+    var key=chosen?playerOptionValue(chosen,visiblePlayers()):null;
+    if(key&&names.includes(key))seasonName=key;
     if(!names.includes(seasonName))seasonName=names[0]||null;
-    $('season-player').innerHTML=names.map(function(name){
-      return '<option value="'+escapeHtml(name)+'"'+
-        (name===seasonName?' selected':'')+'>'+escapeHtml(name)+'</option>';
+    $('season-player').innerHTML=options.map(function(x){
+      return '<option value="'+escapeHtml(x.value)+'"'+
+        (x.value===seasonName?' selected':'')+'>'+escapeHtml(x.player.name)+
+        ' · '+(x.player.platform==='xbox'?'Xbox':'PlayStation')+'</option>';
     }).join('');
     $('season-player').value=seasonName||'';
     $('season-player').disabled=!seasonName;
@@ -612,9 +617,9 @@
   }
 
   async function loadSeason() {
-    var name=seasonName;
-    if(!name)return;
-    var type=$('season-type').value,request=++seasonRequest;
+    var choice=seasonName,p=findPlayer(choice);
+    if(!p)return;
+    var name=p.name,type=$('season-type').value,request=++seasonRequest;
     $('season-note').textContent='Reading saved '+type+' data for '+name+'…';
     $('season-results').innerHTML='';
     seasonHistory=null;
@@ -622,13 +627,13 @@
     $('season-history-summary').innerHTML='';
     $('season-history-note').textContent='Reading stored PUBG season observations…';
     try{
-      var platform=findPlayer(name)?.platform||'auto';
+      var platform=p.platform;
       var result=await fetch('/api/public-season?name='+encodeURIComponent(name)+
         '&platform='+encodeURIComponent(platform)+'&type='+encodeURIComponent(type),
         {cache:'no-store',headers:{Accept:'application/json'}});
       if(!result.ok)throw Error('HTTP '+result.status);
       var payload=await result.json();
-      if(request!==seasonRequest||seasonName!==name||type!==$('season-type').value)return;
+      if(request!==seasonRequest||seasonName!==choice||type!==$('season-type').value)return;
       $('season-note').textContent=(payload.note||'Saved PUBG season data')+
         (payload.seasonId?' · '+payload.seasonId:'')+
         (payload.savedAt?' · Saved '+dateText(payload.savedAt):'');
@@ -665,11 +670,13 @@
       $('season-history-chart').innerHTML='';
     }
   }
-  async function refreshFromPubg(scope,name,statusId) {
-    if(!name)return false;
-    var player=findPlayer(name);
-    var target=$(statusId);
-    var platform=player?.platform||'auto';
+  async function refreshFromPubg(scope,choice,statusId) {
+    var player=findPlayer(choice),target=$(statusId);
+    if(!player) {
+      target.textContent='Choose an Xbox or PlayStation account before refreshing.';
+      return false;
+    }
+    var name=player.name,platform=player.platform;
     target.textContent='Requesting '+scope+' from PUBG within the shared API budget…';
     var refreshButton=scope==='weapons'?'weapons-refresh':
       scope==='matches'?'match-refresh':'season-refresh';
